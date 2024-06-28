@@ -1,8 +1,11 @@
 import openai
+import os
+from dotenv import load_dotenv
 
-# Function to initialize the OpenAI API
+# Import the OpenAI API key from a separate .env file
+load_dotenv()
 def initialize_openai(api_key):
-    openai.api_key = api_key
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function to get user input with a prompt
 def get_user_input(prompt):
