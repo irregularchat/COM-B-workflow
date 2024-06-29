@@ -200,7 +200,7 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
             break
         else:
             # prompt user to refine the capable pta with suggestions then send to gpt to refine further
-            user_input = get_user_input("How should the current target audience be refined?: ")
+            user_input = get_user_input("How should the current target audience be refined or broadened?: ")
             prompt = "refine the current target audience using: {user_input}"
             capable_pta, chat_history = chat_with_ai(prompt, chat_history)
     while True:
@@ -226,7 +226,44 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
 
 # Function to assess opportunity of capable pta to refine to be capable_and_opportune_pta or to consider interventions to create opportunities
 def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, constraints, restraints):
-
+    chat_history = [] # Initialize history for the conversation
+    social_prompt = f"We are assessing the environmental opportunity in or around {area_of_focus} of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the opportunities and limitations in the environment - social context?"
+    physical_prompt = f"We are assessing the environmental opportunity in or around {area_of_focus} of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the opportunities and limitations in the environment -  physical context?"
+    social_opportune_pta, chat_history = chat_with_ai(social_prompt, chat_history)
+    physical_opportune_pta, chat_history = chat_with_ai(physical_prompt, chat_history)
+    print(f"Social Opportune PTA: {social_opportune_pta}")
+    print(f"Physical Opportune PTA: {physical_opportune_pta}")
+    # merge pta to find the intersection of the two
+    capable_opportune_pta, chat_history = chat_with_ai("Merge the social opportune PTA and physical opportune PTA to find the intersection of the two potential target audiences. attributes must be distinct enough that they can be measured or searched against when searching for this target audience", chat_history)
+    print("intermediate behaviors: " + intermediate_behaviors)
+    print("In the area of focus: " + area_of_focus)
+    print("With constraints: " + constraints)
+    print("With restraints: " + restraints)
+    while True:
+        print("The current target adudience capable of performing the desired behavior is: " + opportune_pta)
+        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            # prompt user to refine the capable pta with suggestions then send to gpt to refine further
+            user_input = get_user_input("How should the current target audience be refined or broadened?: ")
+            prompt = "modify the current target audience: {user_input}"
+            capable_opportune_pta, chat_history = chat_with_ai(prompt, chat_history)
+    while True:
+        # print to the user the origional pta and the refined pta based on capability. ask the user if they accept the refined pta or to return to the origional pta
+        print("The origional potential target audience was: " + capable_pta)
+        print("The refined potential target audience based on capability is: " + capable_opportune_pta)
+        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            capable_opportune_pta = capable_pta
+            # find interventions from the behavior change wheel that can help the target audience to be able to perform the desired behavior
+            social_interventions_prompt = f"Given {social_help_pta} does not have full opportunity to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            physical_interventions_prompt = f"Given {physical_help_pta} does not have full opportunity to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            social_interventions, chat_history = chat_with_ai(social_interventions_prompt, chat_history)
+            physical_interventions, chat_history = chat_with_ai(physical_interventions_prompt, chat_history)
+    return capable_opportune_pta
 # Function to assess motivation through a chat
 def assess_motivation(intermediate_behaviors):
     chat_history = [] # Initialize history for the conversation
