@@ -359,16 +359,38 @@ def main():
     pta_description = get_user_input("Describe the Potential Target Audience (PTA): ")
     
     # Step 4: Assess Capability
-    capability_enablers = assess_capability(intermediate_behaviors)
-    print(f"Capability enablers: {capability_enablers}")
-    
+    capable_pta = assess_capability(intermediate_behaviors)
+    #print interventions required if pta = capable_pta
+    if pta == capable_pta:
+        print("The Potential Target Audience did not refine based on capability and therefore requires interventions to help them to be able to perform the desired behavior.")
+        print("Interventions to help the target audience to be able to perform the desired behavior:")
+        print("Psychological interventions: " + psychological_interventions)
+        print("Physical interventions: " + physical_interventions)
+    else:
+        print("The Potential Target Audience refined based on capability.")
+        print("The Potential Target Audience is now: " + capable_pta)
+
     # Step 5: Assess Opportunity
-    opportunity_enablers = assess_opportunity(intermediate_behaviors)
-    print(f"Opportunity enablers: {opportunity_enablers}")
+    capable_opportune_pta = assess_opportunity(intermediate_behaviors)
+    #print interventions required if capable_pta = capable_opportune_pta
+    if capable_pta == capable_opportune_pta:
+        print("The Potential Target Audience did not refine based on opportunity and therefore requires interventions to help them to be able to perform the desired behavior.")
+        print("Interventions to help the target audience to be able to perform the desired behavior:")
+        print("Social interventions: " + social_interventions)
+        print("Physical interventions: " + physical_interventions) 
     
     # Step 6: Assess Motivation
-    motivation_enablers = assess_motivation(intermediate_behaviors)
-    print(f"Motivation enablers: {motivation_enablers}")
+    refined_target_audience = assess_motivation(intermediate_behaviors)
+    #print interventions required if capable_opportune_pta = refined_target_audience
+    if capable_opportune_pta == refined_target_audience:
+        print("The Potential Target Audience did not refine based on motivation and therefore requires interventions to help them to be able to perform the desired behavior.")
+        print("Interventions to help the target audience to be able to perform the desired behavior:")
+        print("Automatic interventions: " + automatic_interventions)
+        print("Reflective interventions: " + reflective_interventions)
+    else:
+        print("The Potential Target Audience refined based on motivation.")
+        print("The Potential Target Audience is now: " + refined_target_audience)
+        print("An Inform campaign is recommended to help the target audience to be able to perform the desired behavior.")
     
     # Step 7: Determine HPEM Stage
     hpem_stage = determine_hpem_stage()
