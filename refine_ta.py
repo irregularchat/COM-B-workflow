@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
-def initialize_openai(api_key):
+def initialize_openai():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Function to get user input with a prompt
@@ -337,7 +337,7 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
 # Main function to guide the user through the process
 def main():
     print("Welcome to the Target Audience Refinement Tool using COM-B and HPEM Models.")
-    initialize_openai(api_key)
+    initialize_openai()
     # Step 0 : Define the Area Mission and Objectives
     define_mission()
     create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
