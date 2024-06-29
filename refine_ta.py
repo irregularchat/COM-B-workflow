@@ -65,6 +65,12 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
     chat_with_ai(prompt, chat_history)
     return spo
 
+def parse_spo(spo):
+    #parse the spo list and return a list of strings
+    spo_list = []
+    for i in range(len(spo)):
+        spo_list.append(spo
+    return spo_list
 # Function to refine the desired behavior
 def refine_desired_behavior(initial_behavior):
     chat_history = [] # Initialize chat history for the conversation
@@ -80,6 +86,12 @@ def refine_desired_behavior(initial_behavior):
             refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
     return refined_behavior
 
+def parse_intermediate_behaviors(intermediate_behaviors):
+    #parse the intermediate behaviors list and return a list of strings
+    intermediate_behaviors_list = []
+    for i in range(len(intermediate_behaviors)):
+        intermediate_behaviors_list.append(intermediate_behaviors)
+    return intermediate_behaviors_list
 # Function to break down the desired behavior into intermediate behaviors
 def break_down_behavior(refined_behavior):
     chat_history = [] # Initialize history for the conversation
@@ -87,11 +99,13 @@ def break_down_behavior(refined_behavior):
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     
     while True:
-        print(f"Intermediate behaviors suggestion: {intermediate_behaviors}")
+        parse_intermediate_behaviors(intermediate_behaviors)
+        print(f"/nIntermediate behaviors suggestion: {intermediate_behaviors_list}")
         user_input = get_user_input("Are these intermediate behaviors acceptable? (yes/no): ")
         if user_input.lower() == 'yes':
             break 
         else:
+            print("You may identify intermediate behaviors by number (e.g replace '1' with 'TA greets the customer' OR e.g replace expand after 4) ")
             prompt = "How can we refine these intermediate behaviors?"
             intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     return intermediate_behaviors
