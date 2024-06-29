@@ -222,6 +222,10 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
             physical_interventions_prompt = f"Given {physical_help_pta} does not have full capability to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
             psychological_interventions, chat_history = chat_with_ai(psychological_interventions_prompt, chat_history)
             physical_interventions, chat_history = chat_with_ai(physical_interventions_prompt, chat_history)
+            #Print the interventions to the user
+            print ("Interventions to help the target audience to be able to perform the desired behavior:")
+            print("Psychological interventions: " + psychological_interventions)
+            print("Physical interventions: " + physical_interventions)
     return capable_pta
 
 # Function to assess opportunity of capable pta to refine to be capable_and_opportune_pta or to consider interventions to create opportunities
@@ -263,6 +267,10 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
             physical_interventions_prompt = f"Given {physical_help_pta} does not have full opportunity to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
             social_interventions, chat_history = chat_with_ai(social_interventions_prompt, chat_history)
             physical_interventions, chat_history = chat_with_ai(physical_interventions_prompt, chat_history)
+            #Print the interventions to the user
+            print ("Interventions to help the target audience to be able to perform the desired behavior:")
+            print("Social interventions: " + social_interventions)
+            print("Physical interventions: " + physical_interventions)
     return capable_opportune_pta
 # Function to assess motivation through a chat
 def assess_motivation(intermediate_behaviors):
