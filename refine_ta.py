@@ -1,6 +1,4 @@
-from openai import OpenAI
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+import openai
 import os
 import argparse
 from dotenv import load_dotenv
@@ -8,9 +6,22 @@ from dotenv import load_dotenv
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
 def initialize_openai():
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     if openai.api_key is None:
         raise ValueError("OpenAI API key not found. Please set it in the .env file.")
 
+# Function to get AI suggestions
+def get_ai_suggestions(prompt):
+    try:
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",
+            prompt=prompt,
+            max_tokens=300
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        print(f"Error getting AI suggestions: {e}")
+        return ""
 # Function to get user input with a prompt
 def get_user_input(prompt):
     try:
@@ -18,25 +29,15 @@ def get_user_input(prompt):
     except EOFError:
         print("\nEOFError: Input stream ended unexpectedly.")
         return ""
-
-# Function to get AI suggestions
-def get_ai_suggestions(prompt):
-    try:
-        response = client.completions.create(engine="gpt-3.5-turbo",
-        prompt=prompt,
-        max_tokens=300)
-        return response.choices[0].text.strip()
-    except Exception as e:
-        print(f"Error getting AI suggestions: {e}")
-        return ""
-
 # Function to chat with AI for detailed responses
 def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
-        response = client.chat.completions.create(model="gpt-4",  # Corrected to gpt-4
-        messages=chat_history)
-        ai_response = response.choices[0].message.content
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=chat_history
+        )
+        ai_response = response.choices[0].message['content']
         chat_history.append({"role": "assistant", "content": ai_response})
         return ai_response, chat_history
     except Exception as e:
@@ -58,17 +59,14 @@ def define_mission():
         if operational_objective == "":
             print("Operational objective cannot be empty.")
 
-
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
         if psychological_objective == "":
             print("Psychological objective cannot be empty.")
 
-
     constraints = get_user_input("Enter the constraints (optional) (e.g., time, resources, etc.): ")
     if constraints == "":
         constraints = "None"
-
 
     restraints = get_user_input("Enter the restraints (optional) (e.g., rules, regulations, etc.): ")
     if restraints == "":
