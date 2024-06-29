@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import os
 import argparse
 from dotenv import load_dotenv
@@ -6,7 +8,6 @@ from dotenv import load_dotenv
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
 def initialize_openai():
-    openai.api_key = os.getenv("OPENAI_API_KEY")
     if openai.api_key is None:
         raise ValueError("OpenAI API key not found. Please set it in the .env file.")
 
@@ -21,11 +22,9 @@ def get_user_input(prompt):
 # Function to get AI suggestions
 def get_ai_suggestions(prompt):
     try:
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo",
-            prompt=prompt,
-            max_tokens=300
-        )
+        response = client.completions.create(engine="gpt-3.5-turbo",
+        prompt=prompt,
+        max_tokens=300)
         return response.choices[0].text.strip()
     except Exception as e:
         print(f"Error getting AI suggestions: {e}")
@@ -35,11 +34,9 @@ def get_ai_suggestions(prompt):
 def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
-        response = openai.ChatCompletion.create(
-            model="gpt-4",  # Corrected to gpt-4
-            messages=chat_history
-        )
-        ai_response = response.choices[0].message['content']
+        response = client.chat.completions.create(model="gpt-4",  # Corrected to gpt-4
+        messages=chat_history)
+        ai_response = response.choices[0].message.content
         chat_history.append({"role": "assistant", "content": ai_response})
         return ai_response, chat_history
     except Exception as e:
@@ -50,33 +47,33 @@ def define_mission():
     area_of_focus = ""
     operational_objective = ""
     psychological_objective = ""
-    
+
     while area_of_focus == "":
         area_of_focus = get_user_input("Enter the area of focus: ")
         if area_of_focus == "":
             print("Area of focus cannot be empty.")
-    
+
     while operational_objective == "":
         operational_objective = get_user_input("Enter the operational objective: ")
         if operational_objective == "":
             print("Operational objective cannot be empty.")
-    
-    
+
+
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
         if psychological_objective == "":
             print("Psychological objective cannot be empty.")
-    
-    
+
+
     constraints = get_user_input("Enter the constraints (optional) (e.g., time, resources, etc.): ")
     if constraints == "":
         constraints = "None"
-    
-    
+
+
     restraints = get_user_input("Enter the restraints (optional) (e.g., rules, regulations, etc.): ")
     if restraints == "":
         restraints = "None"
-    
+
     print(f"Area of focus: {area_of_focus}")
     print(f"Operational objective: {operational_objective}")
     print(f"Psychological objective: {psychological_objective}")
@@ -210,18 +207,18 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
     physical_prompt = (f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consists of {intermediate_behaviors}. "
                        f"The current Target Audience is {pta}. Based on the physical capabilities required, refine the current target audience to the broadest group "
                        f"of the current target audience who has the capability to do this behavior.")
-    
+
     psychological_capable_pta, chat_history = chat_with_ai(psychological_prompt, chat_history)
     physical_capable_pta, chat_history = chat_with_ai(physical_prompt, chat_history)
     print(f"Psychological Capable PTA: {psychological_capable_pta}")
     print(f"Physical Capable PTA: {physical_capable_pta}")
-    
+
     capable_pta, chat_history = chat_with_ai("Merge the psychological capable PTA and physical capable PTA to find the intersection of the two potential target audiences. Attributes must be distinct enough that they can be measured or searched against when searching for this target audience.", chat_history)
     print("Intermediate behaviors: " + intermediate_behaviors)
     print("In the area of focus: " + area_of_focus)
     print("With constraints: " + constraints)
     print("With restraints: " + restraints)
-    
+
     while True:
         print("The current target audience capable of performing the desired behavior is: " + capable_pta)
         user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
@@ -231,7 +228,7 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
             user_input = get_user_input("How should the current target audience be refined or broadened?: ")
             prompt = f"Refine the current target audience using: {user_input}"
             capable_pta, chat_history = chat_with_ai(prompt, chat_history)
-    
+
     while True:
         print("The original potential target audience was: " + pta)
         print("The refined potential target audience based on capability is: " + capable_pta)
@@ -267,13 +264,13 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
     physical_opportune_pta, chat_history = chat_with_ai(physical_prompt, chat_history)
     print(f"Social Opportune PTA: {social_opportune_pta}")
     print(f"Physical Opportune PTA: {physical_opportune_pta}")
-    
+
     capable_opportune_pta, chat_history = chat_with_ai("Merge the social opportune PTA and physical opportune PTA to find the intersection of the two potential target audiences. Attributes must be distinct enough that they can be measured or searched against when searching for this target audience.", chat_history)
     print("Intermediate behaviors: " + intermediate_behaviors)
     print("In the area of focus: " + area_of_focus)
     print("With constraints: " + constraints)
     print("With restraints: " + restraints)
-    
+
     while True:
         print("The current target audience capable of performing the desired behavior is: " + capable_opportune_pta)
         user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
@@ -283,7 +280,7 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
             user_input = get_user_input("How should the current target audience be refined or broadened?: ")
             prompt = f"Modify the current target audience: {user_input}"
             capable_opportune_pta, chat_history = chat_with_ai(prompt, chat_history)
-    
+
     while True:
         print("The original potential target audience was: " + capable_pta)
         print("The refined potential target audience based on opportunity is: " + capable_opportune_pta)
@@ -311,13 +308,13 @@ def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_foc
     reflective_motivated_pta, chat_history = chat_with_ai(reflective_prompt, chat_history)
     print(f"Automatic Motivated PTA: {automatic_motivated_pta}")
     print(f"Reflective Motivated PTA: {reflective_motivated_pta}")
-    
+
     motivated_pta, chat_history = chat_with_ai("Merge the automatic motivated PTA and reflective motivated PTA to find the intersection of the two potential target audiences. Attributes must be distinct enough that they can be measured or searched against when searching for this target audience.", chat_history)
     print("Intermediate behaviors: " + intermediate_behaviors)
     print("In the area of focus: " + area_of_focus)
     print("With constraints: " + constraints)
     print("With restraints: " + restraints)
-    
+
     while True:
         print("The current target audience capable of performing the desired behavior is: " + motivated_pta)
         user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
@@ -327,7 +324,7 @@ def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_foc
             user_input = get_user_input("How should the current target audience be refined or broadened?: ")
             prompt = f"Modify the current target audience: {user_input}"
             motivated_pta, chat_history = chat_with_ai(prompt, chat_history)
-    
+
     while True:
         print("The original potential target audience was: " + capable_opportune_pta)
         print("The refined potential target audience based on motivation is: " + motivated_pta)
@@ -349,7 +346,7 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
     chat_history = []  # Initialize history for the conversation
     stages = ["Awareness", "Understanding", "Attitude", "Preference", "Intention", "Behavior"]
     current_stage = stages[0]
-    
+
     for stage in stages:
         prompt = f"Is {refined_target_audience} in {area_of_focus} likely at the '{stage}' stage to perform {desired_behavior}? What indicators or behaviors should we look for?"
         response, chat_history = chat_with_ai(prompt, chat_history)
@@ -363,10 +360,10 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
 def main():
     print("Welcome to the Target Audience Refinement Tool using COM-B and HPEM Models.")
     initialize_openai()
-    
+
     # Step 0: Define the Area Mission and Objectives
     area_of_focus, operational_objective, psychological_objective, constraints, restraints = define_mission()
-    
+
     # Step 1: Define and refine the desired behavior
     spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
     print(f"Supporting Psychological Objectives (SPO): {spo}")
@@ -381,20 +378,20 @@ def main():
     # Step 3: Describe the Potential Target Audience (PTA)
     pta_description = select_potential_target_audience(refined_behavior, intermediate_behaviors, constraints, restraints)
     print(f"Potential Target Audience (PTA): {pta_description}")
-    
+
     # Step 4: Assess Capability
     capable_pta = assess_capability(intermediate_behaviors, refined_behavior, pta_description, area_of_focus, constraints, restraints)
-    
+
     # Step 5: Assess Opportunity
     capable_opportune_pta = assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, constraints, restraints)
-    
+
     # Step 6: Assess Motivation
     refined_target_audience = assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_focus, constraints, restraints)
-    
+
     # Step 7: Determine HPEM Stage
     hpem_stage = determine_hpem_stage(refined_target_audience, refined_behavior, area_of_focus, constraints, restraints)
     print(f"The current HPEM stage of the TA is: {hpem_stage}")
-    
+
     # Step 8: Get AI suggestions for intermediate objectives and strategies
     intermediate_objectives_prompt = f"Given the TA is at the {hpem_stage} stage, what are the intermediate objectives and strategies to move them to the next stage?"
     intermediate_objectives = get_ai_suggestions(intermediate_objectives_prompt)
