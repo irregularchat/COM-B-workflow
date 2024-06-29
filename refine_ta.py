@@ -57,10 +57,12 @@ def define_mission():
     if restraints == "":
         restraints = "None"
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    chat_history = [] # Initialize chat history for the conversation
     # prompt gpt to create a specific, measurable, and observable supporting psychological objective (SPO) Plan of execution becomes somewhat  linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding achievement of the psychological_objective (PO), which ultimately supports the commander’s objectives. given the area_of_focus, operational_objective, and psychological_objective 
     # prompt to gpt should return a numbered list of SPOs which python will parse and return as a list of strings for user to select from and modify as needed
     # SPOs are the culmination of intermediate objectives, and are the final objectives that lead to the psychological objective
-    
+    prompt = f"Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', create specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. Consider the constraints: {constraints} and restraints: {restraints}."
+    chat_with_ai(prompt, chat_history)
     return spo
 
 # Function to refine the desired behavior
