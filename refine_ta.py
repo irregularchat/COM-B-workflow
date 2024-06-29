@@ -1,5 +1,6 @@
 import openai
 import os
+import argparse
 from dotenv import load_dotenv
 
 # Import the OpenAI API key from a separate .env file
