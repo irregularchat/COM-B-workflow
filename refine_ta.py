@@ -120,7 +120,31 @@ def break_down_behavior(refined_behavior):
             prompt = "How can we refine these intermediate behaviors?"
             intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     return intermediate_behaviors
+def parse_pta(pta):
+    #parse the pta list and return a list of strings
+    pta_list = []
+    for i in range(len(pta)):
+        pta_list.append(pta)
+    return pta_list
 
+def select_potential_target_audience(desired_behavior, intermediate_behaviors, constraints, restraints):
+    chat_history = [] # Initialize chat history for the conversation
+    # prompt gpt to create a potential target audience
+    # prompt to gpt should return a numbered list of potential target audiences which python will parse and return as a list of strings for user to select from and modify as needed
+    prompt = f"Given the desired behavior: '{desired_behavior}' which will require intermediate behaviors: '{intermediate_behaviors_list}', but have constraints: {constraints}, and restraints: {restraints}, create a numbered list of recommended groups, demographics, people of specific psychographics, or individuals that can achieve this behavior."
+    # store the response from gpt as pta and parse it then prompt the user to select a pta from the list and modify as needed
+    pta, chat_history = chat_with_ai(prompt, chat_history)
+    pta_list = parse_pta(pta)
+    for i in range(len(pta_list)):
+        print(f"{i+1}. {pta_list[i]}")
+    while True:
+        user_input = get_user_input("Select a potential target audience from the list above: ")
+        if user_input in range(len(pta_list)):
+            break
+        else:
+            print("Please select a valid number from the list above.")
+    return pta
+    
 # Function to assess capability through a chat
 def assess_capability(intermediate_behaviors):
     chat_history = [] # Initialize history for the conversation
