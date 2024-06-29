@@ -273,28 +273,59 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
             print("Physical interventions: " + physical_interventions)
     return capable_opportune_pta
 # Function to assess motivation through a chat
-def assess_motivation(intermediate_behaviors):
+def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_focus, constraints, restraints):
     chat_history = [] # Initialize history for the conversation
-    prompt = f"We are assessing the motivation of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the automatic (habits, emotions, values) and reflective (identity, beliefs, goals) motivations and limitations?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    motivation_details = get_user_input("Enter the details of automatic and reflective motivations and limitations: ")
-    
-    prompt = f"Based on these details: {motivation_details}, how can we enhance the motivation of the TA to perform the action?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    
-    motivation_enablers = get_user_input("Enter the enablers to enhance motivation: ")
-    return motivation_enablers
+    automatic_prompt = f"We are assessing the motivation of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the automatic motivations and habits that can help the TA to perform the behavior?"
+    reflective_prompt = f"We are assessing the motivation of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the reflective motivations and beliefs that can help the TA to perform the behavior?"
+    automatic_motivated_pta, chat_history = chat_with_ai(automatic_prompt, chat_history)
+    reflective_motivated_pta, chat_history = chat_with_ai(reflective_prompt, chat_history)
+    print(f"Automatic Motivated PTA: {automatic_motivated_pta}")
+    print(f"Reflective Motivated PTA: {reflective_motivated_pta}")
+    # merge pta to find the intersection of the two
+    motivated_pta, chat_history = chat_with_ai("Merge the automatic motivated PTA and reflective motivated PTA to find the intersection of the two potential target audiences. attributes must be distinct enough that they can be measured or searched against when searching for this target audience", chat_history)
+    print("intermediate behaviors: " + intermediate_behaviors)
+    print("In the area of focus: " + area_of_focus)
+    print("With constraints: " + constraints)
+    print("With restraints: " + restraints)
+    while True:
+        print("The current target adudience capable of performing the desired behavior is: " + motivated_pta)
+        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            # prompt user to refine the capable pta with suggestions then send to gpt to refine further
+            user_input = get_user_input("How should the current target audience be refined or broadened?: ")
+            prompt = "modify the current target audience: {user_input}"
+            motivated_pta, chat_history = chat_with_ai(prompt, chat_history)
+    while True:
+        # print to the user the origional pta and the refined pta based on capability. ask the user if they accept the refined pta or to return to the origional pta
+        print("The origional potential target audience was: " + capable_opportune_pta)
+        print("The refined potential target audience based on capability is: " + motivated_pta)
+        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            motivated_pta = capable_opportune_pta
+            # find interventions from the behavior change wheel that can help the target audience to be able to perform the desired behavior
+            automatic_interventions_prompt = f"Given {automatic_help_pta} does not have full motivation to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            reflective_interventions_prompt = f"Given {reflective_help_pta} does not have full motivation to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            automatic_interventions, chat_history = chat_with_ai(automatic_interventions_prompt, chat_history)
+            reflective_interventions, chat_history = chat_with_ai(reflective_interventions_prompt, chat_history)
+            #Print the interventions to the user
+            print ("Interventions to help the target audience to be able to perform the desired behavior:")
+            print("Automatic interventions: " + automatic_interventions)
+            print("Reflective interventions: " + reflective_interventions)
+    return refined_target_audience
 
 # Function to determine current HPEM stage through a chat
-def determine_hpem_stage():
+def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focus, constraints, restraints):
     chat_history = [] # Initialize history for the conversation
     stages = ["Awareness", "Understanding", "Attitude", "Preference", "Intention", "Behavior"]
     current_stage = stages[0]
     
     for stage in stages:
-        prompt = f"Is the TA at the '{stage}' stage? What indicators or behaviors should we look for?"
+        #TODO: Add a google search here to find historical data on the target audience to determine the current stage
+        prompt = f"Is {refined_target_audience} in {area_of_focus} likely at the '{stage}' stage to perform {desired_behavior} ? What indicators or behaviors should we look for?"
         response, chat_history = chat_with_ai(prompt, chat_history)
         print(response)
         user_input = get_user_input(f"Is the TA at the '{stage}' stage? (yes/no): ")
