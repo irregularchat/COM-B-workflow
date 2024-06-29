@@ -144,6 +144,38 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
         else:
             print("Please select a valid number from the list above.")
     return pta
+
+def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restraints):
+    chat_history = [] # Initialize chat history for the conversation
+    # prompt gpt to refine the potential target audience
+    # prompt to gpt should return a numbered list of potential target audiences which python will parse and return as a list of strings for user to select from and modify as needed
+    prompt = f"Given the potential target audience: '{pta}', desired behavior: '{desired_behavior}', intermediate behaviors: '{intermediate_behaviors_list}', constraints: {constraints}, and restraints: {restraints}, refine the potential target audience to be focused on target audiences with the capability to do the desired behaviors, who live or go near or are in the area where the behaviors must take place, and who have or might feasibly be influenced to have the motivation to want to perform the desired behavior, including the intermediate behaviors, ."
+    # store the response from gpt as pta and parse it then prompt the user to select a pta from the list and modify as needed
+    pta, chat_history = chat_with_ai(prompt, chat_history)
+    pta_list = parse_pta(pta)
+    for i in range(len(pta_list)):
+        print(f"{i+1}. {pta_list[i]}")
+    while True:
+        user_input = get_user_input("Select a potential target audience from the list above: ")
+        if user_input in range(len(pta_list)):
+            # as user if they accept the pta, want to modify it, want to write one in, or want to select a different pta
+            user_input = get_user_input("Do you want to modify the selected potential target audience? (yes/no): ")
+            if user_input.lower() == 'yes':
+                user_input = get_user_input("Do you want to manually write in a potential target audience? (yes/no): ")
+                if user_input.lower() == 'yes':
+                    pta = get_user_input("Enter the potential target audience: ")
+                else:
+                    #prompt gpt with user inptu modifications and current pta to create a refined_pta
+                    print("The current potential target audience is:" + pta)
+                    user_input = get_user_input("How should the potential target audience be refined or modified?: ")
+                    prompt = "refine the potential target audience using: {user_input}"
+                    refined_pta, chat_history = chat_with_ai(prompt, chat_history)
+            else if user_input.lower() == 'no':
+                refined_pta = pta
+            break
+        else:
+            print("Please select a valid number from the list above.")
+    return refined_pta
     
 # Function to assess capability through a chat
 def assess_capability(intermediate_behaviors):
