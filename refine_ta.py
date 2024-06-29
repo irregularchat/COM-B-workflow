@@ -170,7 +170,7 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
                     user_input = get_user_input("How should the potential target audience be refined or modified?: ")
                     prompt = "refine the potential target audience using: {user_input}"
                     pta, chat_history = chat_with_ai(prompt, chat_history)
-            else if user_input.lower() == 'no':
+            elif user_input.lower() == 'no':
                 pta = pta
             break
         else:
