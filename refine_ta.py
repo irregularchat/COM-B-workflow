@@ -169,13 +169,13 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
                     print("The current potential target audience is:" + pta)
                     user_input = get_user_input("How should the potential target audience be refined or modified?: ")
                     prompt = "refine the potential target audience using: {user_input}"
-                    refined_pta, chat_history = chat_with_ai(prompt, chat_history)
+                    pta, chat_history = chat_with_ai(prompt, chat_history)
             else if user_input.lower() == 'no':
-                refined_pta = pta
+                pta = pta
             break
         else:
             print("Please select a valid number from the list above.")
-    return refined_pta
+    return pta
     
 # Function to assess capability through a chat
 def assess_capability(intermediate_behaviors):
