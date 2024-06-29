@@ -69,7 +69,7 @@ def parse_spo(spo):
     #parse the spo list and return a list of strings
     spo_list = []
     for i in range(len(spo)):
-        spo_list.append(spo
+        spo_list.append(spo)
     return spo_list
 
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
