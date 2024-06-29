@@ -178,39 +178,54 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
     return pta
     
 # Function to assess capability through a chat
-def assess_capability(intermediate_behaviors):
+def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_focus, constraints, restraints):
     chat_history = [] # Initialize history for the conversation
-    prompt = f"We are assessing the capability of the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the physical limitations the TA might have?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    physical_capability = get_user_input("Enter the details of physical limitations: ")
-    
-    prompt = "What are the psychological, cognitive, or interpersonal limitations the TA might have?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    psychological_capability = get_user_input("Enter the details of psychological, cognitive, or interpersonal limitations: ")
-    
-    prompt = f"Based on the physical limitations: {physical_capability} and psychological limitations: {psychological_capability}, how can we enable the TA to overcome these limitations?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    
-    capability_enablers = get_user_input("Enter the enablers to overcome limitations: ")
-    return capability_enablers
+    psychological_prompt = f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consist of {intermediate_behaviors}.  The current Target audeince is {pta}. Based on the psychological (psychological, cognitive and interpersonal) capabilities required refine the current target audience to the broadest group of the current target audience who has the capability to do this behavior?"
+    physical_prompt = f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consist of {intermediate_behaviors}.  The current Target audeince is {pta}. Based on the physical capabilities required refine the current target audience to the broadest group of the current target audience who has the capability to do this behavior?"
 
-# Function to assess opportunity through a chat
-def assess_opportunity(intermediate_behaviors):
-    chat_history = [] # Initialize history for the conversation
-    prompt = f"We are assessing the opportunity for the TA to perform the desired behavior and its intermediate behaviors. Intermediate behaviors: {intermediate_behaviors}. What are the social and physical opportunities and limitations in the environment?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    opportunity_details = get_user_input("Enter the details of social and physical opportunities and limitations: ")
-    
-    prompt = f"Based on these details: {opportunity_details}, how can we create or enhance opportunities for the TA to perform the action?"
-    response, chat_history = chat_with_ai(prompt, chat_history)
-    print(response)
-    
-    opportunity_enablers = get_user_input("Enter the enablers to create or enhance opportunities: ")
-    return opportunity_enablers
+    psychological_capable_pta, chat_history = chat_with_ai(psychological_prompt, chat_history)
+    physical_capable_pta, chat_history = chat_with_ai(physical_prompt, chat_history)
+    print(f"Psychological Capable PTA: {psychological_capable_pta}")
+    print(f"Physical Capable PTA: {physical_capable_pta}")
+    # merge pta to find the intersection of the two
+    capable_pta, chat_history = chat_with_ai("Merge the psychological capable PTA and physical capable PTA to find the intersection of the two potential target audiences. attributes must be distinct enough that they can be measured or searched against when searching for this target audience", chat_history)
+    print("intermediate behaviors: " + intermediate_behaviors)
+    print("In the area of focus: " + area_of_focus)
+    print("With constraints: " + constraints)
+    print("With restraints: " + restraints)
+    while True:
+        print("The current target adudience capable of performing the desired behavior is: " + capable_pta)
+        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            # prompt user to refine the capable pta with suggestions then send to gpt to refine further
+            user_input = get_user_input("How should the current target audience be refined?: ")
+            prompt = "refine the current target audience using: {user_input}"
+            capable_pta, chat_history = chat_with_ai(prompt, chat_history)
+    while True:
+        # print to the user the origional pta and the refined pta based on capability. ask the user if they accept the refined pta or to return to the origional pta
+        print("The origional potential target audience was: " + pta)
+        print("The refined potential target audience based on capability is: " + capable_pta)
+        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        if user_input.lower() == 'yes':
+            break
+        else:
+            capable_pta = pta
+            # focus on providing the interventions that will be needed to help the target audience to be able to perform the desired behavior
+            psychological_help_prompt = f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consist of {intermediate_behaviors}.  The current Target audeince is {pta}. Based on the psychological (psychological, cognitive and interpersonal) capabilities required refine the current target audience to the current target audience who does not have the capability to do this behavior?"
+            physicall_help_prompt = f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consist of {intermediate_behaviors}.  The current Target audeince is {pta}. Based on the physical capabilities required refine the current target audience to the current target audience who does not have the capability to do this behavior?"
+            psychological_help_pta, chat_history = chat_with_ai(psychological_help_prompt, chat_history)
+            physical_help_pta, chat_history = chat_with_ai(physical_help_prompt, chat_history)
+            # find interventions from the behavior change wheel that can help the target audience to be able to perform the desired behavior
+            psychological_interventions_prompt = f"Given {psychological_help_pta} does not have full capability to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            physical_interventions_prompt = f"Given {physical_help_pta} does not have full capability to perform the desired behavior, what interventions from the Behavior Change Wheel can help them to be able to perform the behavior?"
+            psychological_interventions, chat_history = chat_with_ai(psychological_interventions_prompt, chat_history)
+            physical_interventions, chat_history = chat_with_ai(physical_interventions_prompt, chat_history)
+    return capable_pta
+
+# Function to assess opportunity of capable pta to refine to be capable_and_opportune_pta or to consider interventions to create opportunities
+def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, constraints, restraints):
 
 # Function to assess motivation through a chat
 def assess_motivation(intermediate_behaviors):
