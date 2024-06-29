@@ -61,7 +61,7 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
     # prompt gpt to create a specific, measurable, and observable supporting psychological objective (SPO) Plan of execution becomes somewhat  linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding achievement of the psychological_objective (PO), which ultimately supports the commander’s objectives. given the area_of_focus, operational_objective, and psychological_objective 
     # prompt to gpt should return a numbered list of SPOs which python will parse and return as a list of strings for user to select from and modify as needed
     # SPOs are the culmination of intermediate objectives, and are the final objectives that lead to the psychological objective
-    prompt = f"Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', create specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. Consider the constraints: {constraints} and restraints: {restraints}."
+    prompt = f"You are a Military PSYOP Planner. Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', create list of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. Consider the constraints: {constraints} and restraints: {restraints}."
     chat_with_ai(prompt, chat_history)
     return spo
 
@@ -82,8 +82,11 @@ def refine_desired_behavior(initial_behavior):
         if user_input.lower() == 'yes':
             break
         else:
-            prompt = "How can we improve the specificity and measurability of this behavior?"
+            #get user input to refine the behavior then send it to gpt to refine further
+            gpt_instructions = get_user_input("How should this behavior be refined?: ")
+            prompt = "rifine the behavior further using: {gpt_instructions}"
             refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
+            # loop back to the top to prompt the user again
     return refined_behavior
 
 def parse_intermediate_behaviors(intermediate_behaviors):
@@ -95,9 +98,8 @@ def parse_intermediate_behaviors(intermediate_behaviors):
 # Function to break down the desired behavior into intermediate behaviors
 def break_down_behavior(refined_behavior):
     chat_history = [] # Initialize history for the conversation
-    prompt = f"The desired behavior is: '{refined_behavior}'. What are some intermediate behaviors that lead to achieving this behavior?"
+    prompt = f"The desired behavior is: '{refined_behavior}'. Consider in backwards order starting from the desired behavior and backwards from each previous required behavior but then list it in sequental order ending with the desired behavior. What are some intermediate behaviors that lead to achieving this behavior?"
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
-    
     while True:
         parse_intermediate_behaviors(intermediate_behaviors)
         print(f"/nIntermediate behaviors suggestion: {intermediate_behaviors_list}")
