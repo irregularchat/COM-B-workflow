@@ -55,11 +55,11 @@ def define_mission():
     #if restraints is left blank than the restraints will be set to none
     if restraints == "":
         restraints = "None"
-def create_spo(area_of_focus, operational_objective, psychological_objective):
+def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     # prompt gpt to create a specific, measurable, and observable supporting psychological objective (SPO) Plan of execution becomes somewhat  linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding achievement of the psychological_objective (PO), which ultimately supports the commander’s objectives. given the area_of_focus, operational_objective, and psychological_objective 
     # prompt to gpt should return a numbered list of SPOs which python will parse and return as a list of strings for user to select from and modify as needed
     # SPOs are the culmination of intermediate objectives, and are the final objectives that lead to the psychological objective
-    prompt = f"Given the area of focus: {area_of_focus}, operational objective: {operational_objective}, and psychological objective: {psychological_objective}, create a numbered list of specific, measurable, and observable supporting psychological objectives (SPOs) that lead to the psychological objective which ultimately supports the operational objective."
+    
     return spo
 
 # Function to refine the desired behavior
@@ -165,17 +165,13 @@ def main():
     api_key = get_user_input("Please enter your OpenAI API key: ")
     initialize_openai(api_key)
     # Step 0 : Define the Area Mission and Objectives
-    area_of_focus = get_user_input("Enter the area of focus: ")
-    print(f"Area of focus: {area_of_focus}")
-
-    operational_objective = get_user_input("Enter the operational objective: ")
-    print(f"Operational objective: {operational_objective}")
-
-    psychological_objective = get_user_input("Enter the psychological objective: ")
-    print(f"Psychological objective: {psychological_objective}")
+    define_mission()
                             
     # Step 1: Define and refine the desired behavior
-    initial_behavior = get_user_input("Enter the initial desired behavior/action: ")
+    while initial_behavior == "":
+        initial_behavior = get_user_input("Enter the initial desired behavior: ")
+        if initial_behavior == "":
+            print("Desired behavior cannot be empty.")
     refined_behavior = refine_desired_behavior(initial_behavior)
     print(f"Refined desired behavior: {refined_behavior}")
 
