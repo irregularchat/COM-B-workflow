@@ -56,11 +56,11 @@ def define_mission():
     #if restraints is left blank than the restraints will be set to none
     if restraints == "":
         restraints = "None"
+
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = [] # Initialize chat history for the conversation
-    # prompt gpt to create a specific, measurable, and observable supporting psychological objective (SPO) Plan of execution becomes somewhat  linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding achievement of the psychological_objective (PO), which ultimately supports the commander’s objectives. given the area_of_focus, operational_objective, and psychological_objective 
+    # prompt gpt to create a specific, measurable, and observable supporting psychological objective (SPO)
     # prompt to gpt should return a numbered list of SPOs which python will parse and return as a list of strings for user to select from and modify as needed
-    # SPOs are the culmination of intermediate objectives, and are the final objectives that lead to the psychological objective
     prompt = f"You are a Military PSYOP Planner. Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', create list of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. Consider the constraints: {constraints} and restraints: {restraints}."
     chat_with_ai(prompt, chat_history)
     return spo
@@ -71,6 +71,15 @@ def parse_spo(spo):
     for i in range(len(spo)):
         spo_list.append(spo
     return spo_list
+
+def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    chat_history = [] # Initialize chat history for the conversation
+    # prompt gpt to create a specific, measurable, and observable initial behavior
+    # prompt to gpt should return a numbered list of initial behaviors which python will parse and return as a list of strings for user to select from and modify as needed
+    prompt = f"What behavior in {area_of_focus} can occurate that would help to partially or fully achieve {spo} and get closer to '{operational_objective}' by '{psychological_objective}' considering constraints: {constraints}, and restraints: {restraints}, create a numbered list of 3 different behaviors and that could achive this that could be measured in some way."
+    chat_with_ai(prompt, chat_history)
+    return initial_behavior
+    
 # Function to refine the desired behavior
 def refine_desired_behavior(initial_behavior):
     chat_history = [] # Initialize chat history for the conversation
@@ -185,7 +194,8 @@ def main():
     initialize_openai(api_key)
     # Step 0 : Define the Area Mission and Objectives
     define_mission()
-                            
+    create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+                          
     # Step 1: Define and refine the desired behavior
     while initial_behavior == "":
         initial_behavior = get_user_input("Enter the initial desired behavior: ")
