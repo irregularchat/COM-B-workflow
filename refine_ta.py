@@ -337,7 +337,6 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
 # Main function to guide the user through the process
 def main():
     print("Welcome to the Target Audience Refinement Tool using COM-B and HPEM Models.")
-    api_key = get_user_input("Please enter your OpenAI API key: ")
     initialize_openai(api_key)
     # Step 0 : Define the Area Mission and Objectives
     define_mission()
