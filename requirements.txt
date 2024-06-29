@@ -1,5 +1,6 @@
 #requirements.txt
-openai
+OpenAI
 pyperclip
 python-dotenv
 argparse
+os
