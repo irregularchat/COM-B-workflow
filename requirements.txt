@@ -1,0 +1,5 @@
+#requirements.txt
+openai
+pyperclip
+python-dotenv
+argparse
