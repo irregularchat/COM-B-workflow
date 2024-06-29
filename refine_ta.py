@@ -14,12 +14,9 @@ def get_user_input(prompt):
 
 # Function to get AI suggestions
 def get_ai_suggestions(prompt):
-    response = openai.Completion.create(
-        engine="text-davinci-003", # Use the davinci-003 model for text completion instead of a higher capacity model because of the token limit
-        prompt=prompt,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+            engine="gpt-3.5-turbo",
+            prompt=prompt,
+            max_tokens=300
 
 # Function to chat with AI for detailed responses
 def chat_with_ai(prompt, chat_history=[]):
