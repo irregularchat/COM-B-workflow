@@ -163,3 +163,4 @@ cython_debug/
 
 # MacOS Finder 
 .DS_Store
+.env-bak
