@@ -1,7 +1,7 @@
 # COM-B-workflow
 ## Setup
 
-1. Clone the repository or download the script files.
+1. Clone the repository or download the script files. 
 2. Create a virtual environment.
 3. Activate the virtual environment.
 4. Install the required dependencies.
@@ -11,7 +11,21 @@
     1. Go to https://platform.openai.com/account/api-keys and create a new API key.
     1. Save this key in the `.env` file and to a password manager
 
+## How to contribute
+1. Fork the repository (click the fork button at the top right of the page)
+2. Create a branch (git checkout -b feature/feature-name)
+3. Make your changes and commit them (git commit -am 'Add some feature' OR edit directly on the browser press . to launch the editor)
+4. Push your changes to your fork 
+5. Create a pull request (select the main branch as the base branch and your branch as the compare branch)
+6. Wait for the pull request to be reviewed
+
 ### Commands
+Clone the repository:
+```shell
+git clone https://github.com/irregularchat/COM-B-workflow.git
+cd COM-B-workflow
+```
+
 Script to create a virtual environment, installs the dependencies, and creates a `.env` file if it does not exist.
 
 Linux and macOS commands:
@@ -61,6 +75,7 @@ python3 refine_ta.py
 ## Requirements
 
 - Python 3
+- Git (To clone the repository OR download the script files directly like an animal)
 - OpenAI API key
 - Internet connection
 
@@ -72,8 +87,9 @@ The required dependencies are listed in the `requirements.txt` file:
 OpenAI
 pyperclip
 python-dotenv
-os
 argparse
+os
+colorama
 ```
 
 ## References:
