@@ -9,6 +9,8 @@ area_of_focus = os.getenv("AREA_OF_FOCUS", "")
 operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
+psychological_objective= os.getenv("PSYCHOLOGICAL_OBJECTIVE", "")
+spo = os.getenv("SPO", "")
 
 def initialize_openai():
     global client
@@ -60,12 +62,6 @@ def define_mission():
         operational_objective = get_user_input("Enter the operational objective: ")
         if operational_objective == "":
             print("Operational objective cannot be empty.")
-
-    while psychological_objective == "":
-        psychological_objective = get_user_input("Enter the psychological objective: ")
-        if psychological_objective == "":
-            print("Psychological objective cannot be empty.")
-
     constraints = get_user_input("Enter the constraints (optional) (e.g., time, resources, etc.): ")
     if constraints == "":
         constraints = "None"
@@ -76,11 +72,23 @@ def define_mission():
 
     print(f"Area of focus: {area_of_focus}")
     print(f"Operational objective: {operational_objective}")
-    print(f"Psychological objective: {psychological_objective}")
     print("Limitations:")
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints
+def Influence_Mission():
+    global psychological_objective, spo
+    while psychological_objective == "":
+        psychological_objective = get_user_input("Enter the psychological objective: ")
+        if psychological_objective == "":
+            print("Psychological objective cannot be empty.")
+    while spo == "":
+        create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+        if spo == "":
+            print("SPO cannot be empty.")
+    print(f"Psychological objective: {psychological_objective}")
+    print(f"Supporting psychological objective: {spo}")
+    return psychological_objective, spo
 
 def parse_spo(spo):
     try:
@@ -313,10 +321,6 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
     print(f"Physical Capable PTA: {physical_capable_pta}")
 
     capable_pta, chat_history = chat_with_ai("Merge the psychological capable PTA and physical capable PTA to find the intersection of the two potential target audiences. Attributes must be distinct enough that they can be measured or searched against when searching for this target audience.", chat_history)
-    print("Intermediate behaviors: " + intermediate_behaviors)
-    print("In the area of focus: " + area_of_focus)
-    print("With constraints: " + constraints)
-    print("With restraints: " + restraints)
 
     while True:
         print("The current target audience capable of performing the desired behavior is: " + capable_pta)
@@ -365,11 +369,6 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
     print(f"Physical Opportune PTA: {physical_opportune_pta}")
 
     capable_opportune_pta, chat_history = chat_with_ai("Merge the social opportune PTA and physical opportune PTA to find the intersection of the two potential target audiences. Attributes must be distinct enough that they can be measured or searched against when searching for this target audience.", chat_history)
-    print("Intermediate behaviors: " + intermediate_behaviors)
-    print("In the area of focus: " + area_of_focus)
-    print("With constraints: " + constraints)
-    print("With restraints: " + restraints)
-
     while True:
         print("The current target audience capable of performing the desired behavior is: " + capable_opportune_pta)
         user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
@@ -464,7 +463,11 @@ def main():
     area_of_focus, operational_objective, psychological_objective, constraints, restraints = define_mission()
 
     # Step 1: Define and refine the desired behavior
-    spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+    #if spo isn't defined, create it
+    if not spo:
+        spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+    else:
+        spo
     print(f"Supporting Psychological Objectives (SPO): {spo}")
     initial_behavior = create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints)
     refined_behavior = refine_desired_behavior(initial_behavior)
