@@ -38,7 +38,12 @@ def chat_with_ai(prompt, chat_history=[]):
     except Exception as e:
         print(f"Error during chat with AI: {e}")
         return "", chat_history
-
+def generate_question(area_of_focus, operational_objective, constraints, restraints, chat_history):
+    # Generate a question based on the context using the AI
+    question = ""
+    prompt = "Generate a question based on the context focused on an area that is important for the accomplishment of the mission but still not defined well."
+    question, chat_history = chat_with_ai(prompt, chat_history)
+    return question, chat_history
 def define_mission():
     global area_of_focus, operational_objective, constraints, restraints
     if not area_of_focus:
@@ -59,18 +64,17 @@ def define_mission():
             restraints = "None"
 
     # Gather questions to define the mission
+    # ask 1 question at a time and get the answer from the user questions should be dynamic based on the previous answers and the context
     chat_history = []
+    # loop 3 questions and get the answers add q and a in the chat history
     for i in range(3):
-        question_prompt = f"What are three questions that can help define the mission? Consider '{area_of_focus}', '{operational_objective}', '{constraints}', '{restraints}'"
-        question, chat_history = chat_with_ai(question_prompt, chat_history)
+        question, chat_history = generate_question(area_of_focus, operational_objective, constraints, restraints, chat_history)
         if question:
-            print(f"Question {i + 1}: {question}")
-            answer = get_user_input(f"Answer to question {i + 1}: ")
-            chat_history.append({"role": "user", "content": question})
-            chat_history.append({"role": "user", "content": answer})
+            answer = get_user_input(question)
+            if answer:
+                chat_history.append({"role": "user", "content": answer})
         else:
-            print("Error getting AI suggestions for questions.")
-            break
+            print("Error generating question.")
 
     # Create a mission statement based on the answers
     mission_statement = ""
