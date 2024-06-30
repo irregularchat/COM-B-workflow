@@ -4,11 +4,13 @@ from dotenv import load_dotenv
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
+
 # Initialize area of focus, operational objective, constraints, restraints from the .env file
 area_of_focus = os.getenv("AREA_OF_FOCUS", "")
 operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
+
 def initialize_openai():
     global client
     api_key = os.getenv("OPENAI_API_KEY")
@@ -16,9 +18,6 @@ def initialize_openai():
         raise ValueError("OpenAI API key not found. Please set it in the .env file.")
     client = OpenAI(api_key=api_key)
 
-# Function to get AI suggestions
-
-# Function to get user input with a prompt
 def get_user_input(prompt):
     try:
         return input(prompt)
@@ -26,7 +25,6 @@ def get_user_input(prompt):
         print("\nEOFError: Input stream ended unexpectedly.")
         return ""
 
-# Function to chat with AI for detailed responses
 def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
@@ -38,12 +36,14 @@ def chat_with_ai(prompt, chat_history=[]):
     except Exception as e:
         print(f"Error during chat with AI: {e}")
         return "", chat_history
+
 def generate_question(area_of_focus, operational_objective, constraints, restraints, chat_history):
     # Generate a question based on the context using the AI
     question = ""
     prompt = "Generate a question based on the context focused on an area that is important for the accomplishment of the mission but still not defined well."
     question, chat_history = chat_with_ai(prompt, chat_history)
     return question, chat_history
+
 def define_mission():
     global area_of_focus, operational_objective, constraints, restraints
     if not area_of_focus:
@@ -91,15 +91,44 @@ def define_mission():
     print("Limitations:")
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
-
     return area_of_focus, operational_objective, constraints, restraints, mission_statement
+
+def define_cog():
+    global area_of_focus, operational_objective, constraints, restraints
+    chat_history = []
+    print("\nDefining Center of Gravity...")
+
+    # Using the DIME model to generate questions dynamically
+    dime_questions = {
+        "Diplomatic": "What international alliances and diplomatic relations fortify our position?",
+        "Information": "Which communication and propaganda efforts are most influential?",
+        "Military": "What units or systems are crucial for our success?",
+        "Economic": "What economic policies and resources ensure our sustained operations?"
+    }
+    responses = {}
+    for category, question in dime_questions.items():
+        print(question)
+        response = get_user_input("Your response (leave blank if not applicable): ")
+        if response:
+            responses[category] = response
+            chat_history.append({"role": "user", "content": response})
+
+    # Generate a prompt for AI to provide three recommendations
+    context_prompt = "Based on the details provided -- " + ", ".join(f"{k}: {v}" for k, v in responses.items())
+    prompt = context_prompt + " Please provide three potential centers of gravity."
+    cog_definition, chat_history = chat_with_ai(prompt, chat_history)
+
+    print(f"Suggested Centers of Gravity:")
+    cogs = cog_definition.split(";")[:3]  # Assuming AI provides semicolon-separated recommendations
+    for i, cog in enumerate(cogs, 1):
+        print(f"{i}. {cog.strip()}")
 
 def main():
     initialize_openai()
     print("Welcome to the Mission Definition Chatbot!")
-    details = define_mission()
-    print("Mission defined successfully.")
-    print("Thank you for using the Mission Definition Chatbot!")
+    area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission()
+    define_cog()
+    print("Mission defined successfully. Thank you for using the Mission Definition Chatbot!")
 
 if __name__ == "__main__":
     main()
