@@ -2,6 +2,19 @@ from openai import OpenAI
 import os
 import argparse
 from dotenv import load_dotenv
+from colorama import init
+
+# Define formatting
+HEADER = '\033[95m'
+BLUE = '\033[94m'
+CYAN = '\033[96m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+RED = '\033[91m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
+#TODO: Add the rest of the formatting to the script, no spacing between the formatting and the code
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
