@@ -5,6 +5,11 @@ from dotenv import load_dotenv
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
+area_of_focus = os.getenv("AREA_OF_FOCUS", "")
+operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
+constraints = os.getenv("CONSTRAINTS", "None")
+restraints = os.getenv("RESTRAINTS", "None")
+
 def initialize_openai():
     global client
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
