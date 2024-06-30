@@ -5,7 +5,8 @@
 2. Create a virtual environment.
 3. Activate the virtual environment.
 4. Install the required dependencies.
-5. Set your OpenAI API key in an environment variable `OPENAI_API_KEY`.
+5. Create a `.env` file 
+6. Set your OpenAI API key in an environment variable `OPENAI_API_KEY`.
     1. Obtain an API key from OpenAI by creating an account and following the instructions.
     1. Go to https://platform.openai.com/account/api-keys and create a new API key.
     1. Save this key in the `.env` file and to a password manager
@@ -32,6 +33,15 @@ pip install -r requirements.txt
 ## Running the Script
 ### First make sure that you edit .env file and add your OpenAI API key and other requirements
 The more you add in here the faster prompting will be. The .env file is not synced with the git repository so you can add your own information in there.
+Linux and macOS commands:
+```shell
+nano .env
+```
+
+Windows commands:
+```shell
+notepad .env
+```
 
 Run the script using Python:
 This script is focused more on creating a mission statement and identifying a center of gravity. 
