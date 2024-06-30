@@ -154,6 +154,9 @@ def create_initial_behavior(spo, area_of_focus, operational_objective, psycholog
 
     # user input to select the initial behavior
     initial_behavior_list = parse_initial_behavior(initial_behavior)
+    # add printed space and section divider 
+    print(" ")
+    print("####################")
     for i, item in enumerate(initial_behavior_list):
         print(f"{i + 1}. {item}")
     while True:
@@ -182,6 +185,9 @@ def refine_desired_behavior(initial_behavior):
     prompt = f"The initial desired behavior is: '{initial_behavior}'. create a list, not numbered, of potential refined behaviors. Unknown who the target audience (Ta) would be yet but phrase the desired behavior as 'TA verb_here xxx', but don't use markdown, this must be behaviors that are measurable and that would have an impact towards the objective ?"
     refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
     refined_behavior_list = parse_refined_behavior(refined_behavior)
+    # add printed space and section divider 
+    print(" ")
+    print("####################")
     for i, item in enumerate(refined_behavior_list):
         print(f"{i + 1}. {item}")
     while True:
@@ -213,6 +219,10 @@ def break_down_behavior(refined_behavior):
               f"mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE_OPTIONS to complete such as can be done online or autmatically.")
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     intermediate_behaviors_list = parse_intermediate_behaviors(intermediate_behaviors)
+    # add printed space and section divider 
+    print(" ")
+    print("####################")
+
     for i, item in enumerate(intermediate_behaviors_list):
         print(f"{i + 1}. {item}")
             # ask gpt to modify the intermediate behaviors with the user input or continue
@@ -242,9 +252,13 @@ def parse_pta(pta):
 def select_potential_target_audience(desired_behavior, intermediate_behaviors, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the desired behavior: '{desired_behavior}' which will require intermediate behaviors: '{intermediate_behaviors}', "
-              f"but have constraints: {constraints}, and restraints: {restraints}, create a numbered list of recommended groups, demographics, "
-              f"people of specific psychographics, or individuals that can achieve this behavior.")
+              f"but have constraints: {constraints}, and restraints: {restraints}, create a list of recommended target audiences (TA): groups, demographics, "
+              f"people of specific psychographics, or individuals that can achieve this behavior."
+              f"Each TA must be a single line and not numbered.don't use markdown,  without any commentary")
     pta, chat_history = chat_with_ai(prompt, chat_history)
+    # add printed space and section divider 
+    print(" ")
+    print("####################")
     pta_list = parse_pta(pta)
     for i, item in enumerate(pta_list):
         print(f"{i + 1}. {item}")
