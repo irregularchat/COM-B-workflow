@@ -69,12 +69,12 @@ def define_mission():
     while area_of_focus == "":
         area_of_focus = get_user_input("Enter the area of focus: ")
         if area_of_focus == "":
-            print("Area of focus cannot be empty.")
+            print("{RED}Area of focus cannot be empty.{ENDC}")
 
     while operational_objective == "":
         operational_objective = get_user_input("Enter the operational objective: ")
         if operational_objective == "":
-            print("Operational objective cannot be empty.")
+            print("{RED}Operational objective cannot be empty.{ENDC}")
     constraints = get_user_input("Enter the constraints (optional) (e.g., time, resources, etc.): ")
     if constraints == "":
         constraints = "None"
@@ -101,11 +101,11 @@ def influence_mission():
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
         if psychological_objective == "":
-            print("Psychological objective cannot be empty.")
+            print("{RED}Psychological objective cannot be empty.{ENDC}")
     while spo == "":
         spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
         if spo == "":
-            print("SPO cannot be empty.")
+            print("{RED}SPO cannot be empty.{ENDC}")
     print(f"Psychological objective: {psychological_objective}")
     print(f"Supporting psychological objective: {spo}")
     return psychological_objective, spo
@@ -145,7 +145,7 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
 
     # User input for selecting one SPO
     while True:
-        user_input = get_user_input("\nSelect 1 SPO that is the best: ")
+        user_input = get_user_input("\n{YELLOW}Select 1 SPO that is the best:{ENDC} ")
         if user_input.strip().isdigit():
             selected_spo_index = int(user_input) - 1
             if 0 <= selected_spo_index < len(parsed_spo):
@@ -154,15 +154,15 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
             else:
                 print("Invalid selection. Please enter a valid index.")
         else:
-            print("Invalid input. Please enter a number.")
+            print("{RED}Invalid input.{ENDC}  {YELLOW}Please enter a number.{ENDC}")
 
-    print(f"\nSelected SPO:\n1. {selected_spo}")
+    print(f"\n{BOLD}Selected SPO:{ENDC}\n1. {selected_spo}")
 
     # Option to modify the selected SPO
     while True:
-        user_input = get_user_input("\nWould you like to modify the selected SPO? (yes/no): ")
+        user_input = get_user_input("\nWould you like to modify the selected SPO? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
-            modification_prompt = get_user_input("Enter your modifications for the selected SPO: ")
+            modification_prompt = get_user_input("{YELLOW}Enter your modifications for the selected SPO:{ENDC} ")
             prompt = f"Modify the selected SPO: {modification_prompt}"
             spo, chat_history = chat_with_ai(prompt, chat_history)
             parsed_spo = parse_spo(spo)
@@ -171,24 +171,24 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
                 print(f"{idx}. {spo}")
 
             while True:
-                user_input = get_user_input("\nSelect 1 SPO that is the best: ")
+                user_input = get_user_input("\n{YELLOW}Select 1 SPO that is the best:{ENDC} ")
                 if user_input.strip().isdigit():
                     selected_spo_index = int(user_input) - 1
                     if 0 <= selected_spo_index < len(parsed_spo):
                         selected_spo = parsed_spo[selected_spo_index]
                         break
                     else:
-                        print("Invalid selection. Please enter a valid index.")
+                        print("{RED}Invalid selection. Please enter a valid index.{ENDC}")
                 else:
-                    print("Invalid input. Please enter a number.")
+                    print("{RED}{RED}Invalid input.{ENDC}  Please enter a number.{ENDC}")
             break
         elif user_input.lower() == 'no':
             break
         else:
-            print("Invalid input. Please enter 'yes' or 'no'.")
+            print("{RED}Invalid input.{ENDC} {YELLOW}Please enter 'yes' or 'no'.{ENDC}")
 
     if not selected_spo:
-        print("SPO cannot be empty.")
+        print("{RED}SPO cannot be empty.{ENDC}")
         return ""
     spo = selected_spo
     return spo
@@ -224,7 +224,7 @@ def create_initial_behavior(spo, area_of_focus, operational_objective, psycholog
             else:
                 print("Please select a valid number from the list above.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("{RED}{RED}Invalid input.{ENDC}  Please enter a number.{ENDC}")
     
     return initial_behavior_selected
 
@@ -250,14 +250,14 @@ def refine_desired_behavior(initial_behavior):
         print(f"{i + 1}. {item}")
     while True:
         try:
-            user_input = int(get_user_input("Select a refined behavior from the list above: "))
+            user_input = int(get_user_input("{YELLOW}Select a refined behavior from the list above:{ENDC} "))
             if 0 < user_input <= len(refined_behavior_list):
                 refined_behavior_selected = refined_behavior_list[user_input - 1]
                 break
             else:
-                print("Please select a valid number from the list above.")
+                print("{YELLOW}Please select a valid number from the list above.{ENDC}")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("{RED}Invalid input.{ENDC} {YELLOW}Please enter a number.{ENDC}")
     return refined_behavior_selected
 
 def parse_intermediate_behaviors(intermediate_behaviors):
@@ -284,7 +284,7 @@ def break_down_behavior(refined_behavior):
         print(f"{i + 1}. {item}")
     # Ask GPT to modify the intermediate behaviors with the user input or continue
     while True:
-        user_input = get_user_input("Would you like to modify the intermediate behaviors? (yes/no): ")
+        user_input = get_user_input("Would you like to modify the intermediate behaviors? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             modification_prompt = get_user_input("Enter your modifications for the intermediate behaviors: ")
             prompt = f"Modify the intermediate behaviors: {modification_prompt}"
@@ -295,7 +295,7 @@ def break_down_behavior(refined_behavior):
         elif user_input.lower() == 'no':
             break
         else:
-            print("Invalid input. Please enter 'yes' or 'no'.")
+            print("{RED}Invalid input.{ENDC}  Please enter 'yes' or 'no'.")
     return intermediate_behaviors_list
 
 def parse_pta(pta):
@@ -327,7 +327,7 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
             else:
                 print("Please select a valid number from the list above.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("{RED}Invalid input.{ENDC}  {YELLOW}Please enter a number.{ENDC}")
     return pta_selected
 
 def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restraints):
@@ -348,7 +348,7 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
             else:
                 print("Please select a valid number from the list above.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("{RED}Invalid input.{ENDC}  {YELLOW}Please enter a number.{ENDC}")
     return refined_pta_selected
 
 def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_focus, constraints, restraints, operational_context):
@@ -381,7 +381,7 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
 
     while True:
         print(f"\n--- Current Target Audience Capable of Performing the Desired Behavior ---\n{capable_pta}")
-        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        user_input = get_user_input("Is this current target audience acceptable? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -392,7 +392,7 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
     while True:
         print(f"\n--- Original Potential Target Audience ---\n{pta}")
         print(f"\n--- Refined Potential Target Audience Based on Capability ---\n{capable_pta}")
-        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        user_input = get_user_input("Do you accept the refined potential target audience? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -444,7 +444,7 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
 
     while True:
         print(f"\n--- Current Target Audience Capable of Performing the Desired Behavior ---\n{capable_opportune_pta}")
-        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        user_input = get_user_input("Is this current target audience acceptable? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -455,7 +455,7 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
     while True:
         print(f"\n--- Original Potential Target Audience ---\n{capable_pta}")
         print(f"\n--- Refined Potential Target Audience Based on Opportunity ---\n{capable_opportune_pta}")
-        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        user_input = get_user_input("Do you accept the refined potential target audience? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -495,7 +495,7 @@ def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_foc
 
     while True:
         print(f"\n--- Current Target Audience Capable of Performing the Desired Behavior ---\n{motivated_pta}")
-        user_input = get_user_input("Is this current target audience acceptable? (yes/no): ")
+        user_input = get_user_input("Is this current target audience acceptable? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -506,7 +506,7 @@ def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_foc
     while True:
         print(f"\n--- Original Potential Target Audience ---\n{capable_opportune_pta}")
         print(f"\n--- Refined Potential Target Audience Based on Motivation ---\n{motivated_pta}")
-        user_input = get_user_input("Do you accept the refined potential target audience? (yes/no): ")
+        user_input = get_user_input("Do you accept the refined potential target audience? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             break
         else:
@@ -529,7 +529,7 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
         prompt = f"Is {refined_target_audience} in {area_of_focus} likely at the '{stage}' stage to perform {desired_behavior}? What indicators or behaviors should we look for?"
         response, chat_history = chat_with_ai(prompt, chat_history)
         print(response)
-        user_input = get_user_input(f"Is the TA at the '{stage}' stage? (yes/no): ")
+        user_input = get_user_input(f"Is the TA at the '{stage}' stage? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             current_stage = stage
             break
