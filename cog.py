@@ -40,7 +40,8 @@ def chat_with_ai(prompt, chat_history=[]):
 def generate_question(area_of_focus, operational_objective, constraints, restraints, chat_history):
     # Generate a question based on the context using the AI
     question = ""
-    prompt = "Generate a question based on the context focused on an area that is important for the accomplishment of the mission but still not defined well."
+    prompt = f"Based on the mission details -- Area of focus: {area_of_focus}, Objective: {operational_objective}, " \
+                f"Constraints: {constraints}, Restraints: {restraints}. Please provide a question that helps define the mission."
     question, chat_history = chat_with_ai(prompt, chat_history)
     return question, chat_history
 
@@ -92,43 +93,75 @@ def define_mission():
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
     return area_of_focus, operational_objective, constraints, restraints, mission_statement
+def parse_cog_response(response):
+    # Parse the AI response to extract the Center of Gravity definitions
+    cogs = response.split(";")[:3]  # Assuming AI provides semicolon-separated recommendations
+    for i, cog in enumerate(cogs, 1):
+        print(f"{i}. {cog.strip()}")
+    return cogs
+def define_cog(entity_type, area_of_focus, operational_objective, constraints, restraints, mission_statement):
+    print(f"\nDefining Center of Gravity for {entity_type}...")
 
-def define_cog():
-    global area_of_focus, operational_objective, constraints, restraints
+    # Initialize chat history and DIME questions tailored to the entity type
     chat_history = []
-    print("\nDefining Center of Gravity...")
-
-    # Using the DIME model to generate questions dynamically
     dime_questions = {
-        "Diplomatic": "What international alliances and diplomatic relations fortify our position?",
-        "Information": "Which communication and propaganda efforts are most influential?",
-        "Military": "What units or systems are crucial for our success?",
-        "Economic": "What economic policies and resources ensure our sustained operations?"
+        "Diplomatic": f"What international alliances and diplomatic relations fortify {entity_type}'s position?",
+        "Information": f"Which communication and propaganda efforts are most influential for {entity_type}?",
+        "Military": f"What units or systems are crucial for {entity_type}'s success?",
+        "Economic": f"What economic policies and resources ensure {entity_type}'s sustained operations?"
     }
+
+    # Asking DIME-related questions
     responses = {}
     for category, question in dime_questions.items():
-        print(question)
-        response = get_user_input("Your response (leave blank if not applicable): ")
+        print(question)  # Show the question to the user
+        response = get_user_input(f"{category} response for {entity_type} (leave blank if not applicable): ")
         if response:
             responses[category] = response
             chat_history.append({"role": "user", "content": response})
 
-    # Generate a prompt for AI to provide three recommendations
-    context_prompt = "Based on the details provided -- " + ", ".join(f"{k}: {v}" for k, v in responses.items())
-    prompt = context_prompt + " Please provide three potential centers of gravity."
-    cog_definition, chat_history = chat_with_ai(prompt, chat_history)
+    # Build context from mission details and DIME responses
+    mission_context = f"Mission focus: {area_of_focus}, Objective: {operational_objective}, " \
+                      f"Constraints: {constraints}, Restraints: {restraints}, Mission Statement: {mission_statement}"
+    additional_context = ", ".join(f"{k}: {v}" for k, v in responses.items())
+    context_prompt = f"Based on the mission details and {entity_type} specifics -- {mission_context}, {additional_context}. " \
+                     "Please provide 5 potential centers of gravity.semicolen separted.no markdown. no bullet points. no numbering. no commentary"
 
-    print(f"Suggested Centers of Gravity:")
-    cogs = cog_definition.split(";")[:3]  # Assuming AI provides semicolon-separated recommendations
+    # Generate a prompt for AI to provide three recommendations
+    prompt = context_prompt + " Please provide three potential centers of gravity."
+    cog_definitions, chat_history = chat_with_ai(prompt, chat_history)
+
+    # Display suggested CoGs
+    cogs = cog_definitions.split(";")[:5]  # Assuming AI provides semicolon-separated recommendations
     for i, cog in enumerate(cogs, 1):
         print(f"{i}. {cog.strip()}")
+
+    # Allow user interaction to select or modify the recommendations
+    choice = get_user_input(f"Select a CoG to modify/accept (1-{len(cogs)}), or type 'new' to enter a new one: ")
+    if choice.isdigit() and 1 <= int(choice) <= len(cogs):
+        selected_cog = cogs[int(choice) - 1].strip()
+        modify = get_user_input("Would you like to modify this CoG? (yes/no): ")
+        if modify.lower() == "yes":
+            new_cog = get_user_input("Enter your modified Center of Gravity: ")
+            return new_cog
+        else:
+            cog_definitions = selected_cog
+            return cog_definitions
+    elif choice.lower() == 'new':
+        new_cog = get_user_input("Enter your new Center of Gravity: ")
+        cog_definitions += f"; {new_cog}"
+        return cog_definitions
+    else:
+        print("Invalid choice. No changes made.")
+        return None
 
 def main():
     initialize_openai()
     print("Welcome to the Mission Definition Chatbot!")
     area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission()
-    define_cog()
-    print("Mission defined successfully. Thank you for using the Mission Definition Chatbot!")
+    define_cog("friendly", area_of_focus, operational_objective, constraints, restraints, mission_statement)
+    define_cog("enemy", area_of_focus, operational_objective, constraints, restraints, mission_statement)
+    define_cog("host nation", area_of_focus, operational_objective, constraints, restraints, mission_statement)
 
 if __name__ == "__main__":
     main()
