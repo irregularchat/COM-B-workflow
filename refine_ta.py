@@ -9,7 +9,7 @@ area_of_focus = os.getenv("AREA_OF_FOCUS", "")
 operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
-psychological_objective= os.getenv("PSYCHOLOGICAL_OBJECTIVE", "")
+psychological_objective = os.getenv("PSYCHOLOGICAL_OBJECTIVE", "")
 spo = os.getenv("SPO", "")
 
 def initialize_openai():
@@ -41,7 +41,7 @@ def get_user_input(prompt):
 def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
-        response = client.chat.completions.create(model="gpt-4o",
+        response = client.chat.completions.create(model="gpt-4",
                                                   messages=chat_history)
         ai_response = response.choices[0].message.content
         chat_history.append({"role": "assistant", "content": ai_response})
@@ -76,6 +76,7 @@ def define_mission():
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints
+
 def influence_mission():
     global psychological_objective, spo
     while psychological_objective == "":
@@ -83,7 +84,7 @@ def influence_mission():
         if psychological_objective == "":
             print("Psychological objective cannot be empty.")
     while spo == "":
-        create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+        spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
         if spo == "":
             print("SPO cannot be empty.")
     print(f"Psychological objective: {psychological_objective}")
@@ -100,10 +101,21 @@ def parse_spo(spo):
 
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
-    prompt = (f"You are a Military PSYOP Planner. Given the area of focus: '{area_of_focus}', "
-              f"operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', "
+    prompt = (f"You are a Military PSYOP Planner. The Supporting Psychological Objective (SPO) for each series is the culmination point of achieved intermediate objectives. "
+              f"The plan of execution becomes linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding the achievement of the PO, ultimately supporting the commander's objectives. "
+              f"Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', "
               f"create a list without numbers of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. "
-              f"Consider the constraints: {constraints} and restraints: {restraints}. This must only be 1 sentence per line with only the SPO.")
+              f"Consider the constraints: {constraints} and restraints: {restraints}. Each SPO should be one sentence per line, starting with TA and an appropriate action verb. No markdown. No commentary. "
+              f"Use the following categories of verbs to guide your objectives:\n\n"
+              f"#### Action Verbs\n"
+              f"Increases/Decreases, Votes, Participates (in something specific), Surrenders, Turns in, Organizes/Holds, Attends, Registers, Surrenders.\n\n"
+              f"#### Communication Verbs\n"
+              f"Reports, Publicly condemns/states, Purchases, Donates, Signs, Joins, Refers, Comments, Reviews, Rates.\n\n"
+              f"#### Support Verbs\n"
+              f"Volunteers, Completes.\n\n"
+              f"#### Miscellaneous Verbs\n"
+              f"Renews, Subscribes.\n\n"
+              f"Ensure that the SPOs are specific, measurable, and observable, avoiding weaker verbs such as believes, feels, hopes, thinks, understands, realizes, considers, appreciates, recognizes, assumes, dreams, wishes, imagines, envisions, refrains, stops, halts, ceases, restrains, maintains, continues, notes, observes, views, opposes, includes, questions, favors.")
     spo, chat_history = chat_with_ai(prompt, chat_history)
     parsed_spo = parse_spo(spo)
     
@@ -112,38 +124,54 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
     for idx, spo in enumerate(parsed_spo, start=1):
         print(f"{idx}. {spo}")
 
-    # User input for selecting SPOs
+    # User input for selecting one SPO
     while True:
-        user_input = get_user_input("\nSelect 1 or 2 SPOs that are the best (comma-separated if 2): ")
-        selected_spo_indices = [int(i) - 1 for i in user_input.split(',') if i.strip().isdigit()]
-
-        if all(0 <= index < len(parsed_spo) for index in selected_spo_indices) and 1 <= len(selected_spo_indices) <= 2:
-            selected_spos = [parsed_spo[index] for index in selected_spo_indices]
-            break
+        user_input = get_user_input("\nSelect 1 SPO that is the best: ")
+        if user_input.strip().isdigit():
+            selected_spo_index = int(user_input) - 1
+            if 0 <= selected_spo_index < len(parsed_spo):
+                selected_spo = parsed_spo[selected_spo_index]
+                break
+            else:
+                print("Invalid selection. Please enter a valid index.")
         else:
-            print("Invalid selection. Please enter 1 or 2 valid indices.")
+            print("Invalid input. Please enter a number.")
 
-    print("\nSelected SPOs:")
-    for idx, spo in enumerate(selected_spos, start=1):
-        print(f"{idx}. {spo}")
+    print(f"\nSelected SPO:\n1. {selected_spo}")
 
-    # Option to modify the selected SPOs
+    # Option to modify the selected SPO
     while True:
-        modify_input = get_user_input("\nWould you like to modify any of the selected SPOs? (yes/no): ").lower()
-        if modify_input == 'yes':
-            modification_prompt = get_user_input("Enter your modifications for the selected SPOs: ")
-            prompt = f"Refine the following SPOs: {selected_spos}. Modifications: {modification_prompt}"
-            refined_spos, chat_history = chat_with_ai(prompt, chat_history)
-            refined_spos_list = parse_spo(refined_spos)
-            print("\nRefined SPOs:")
-            for idx, spo in enumerate(refined_spos_list, start=1):
+        user_input = get_user_input("\nWould you like to modify the selected SPO? (yes/no): ")
+        if user_input.lower() == 'yes':
+            modification_prompt = get_user_input("Enter your modifications for the selected SPO: ")
+            prompt = f"Modify the selected SPO: {modification_prompt}"
+            spo, chat_history = chat_with_ai(prompt, chat_history)
+            parsed_spo = parse_spo(spo)
+            print("\nModified Supporting Psychological Objectives (SPOs):")
+            for idx, spo in enumerate(parsed_spo, start=1):
                 print(f"{idx}. {spo}")
-            selected_spos = refined_spos_list  # Update selected SPOs with refined ones
-        elif modify_input == 'no':
+
+            while True:
+                user_input = get_user_input("\nSelect 1 SPO that is the best: ")
+                if user_input.strip().isdigit():
+                    selected_spo_index = int(user_input) - 1
+                    if 0 <= selected_spo_index < len(parsed_spo):
+                        selected_spo = parsed_spo[selected_spo_index]
+                        break
+                    else:
+                        print("Invalid selection. Please enter a valid index.")
+                else:
+                    print("Invalid input. Please enter a number.")
+            break
+        elif user_input.lower() == 'no':
             break
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
-    spo = selected_spos
+
+    if not selected_spo:
+        print("SPO cannot be empty.")
+        return ""
+    spo = selected_spo
     return spo
 
 def parse_initial_behavior(initial_behavior):
@@ -153,16 +181,17 @@ def parse_initial_behavior(initial_behavior):
     except Exception as e:
         print(f"Error parsing initial behavior: {e}")
         return []
+
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"What behavior in {area_of_focus} can help achieve {spo} and get closer to '{operational_objective}' "
               f"by '{psychological_objective}' considering constraints: {constraints}, and restraints: {restraints}? "
-              f"Create a list of 5 different behaviors that could be measured in some way. do not number. only return a sentence of the behavior.")
+              f"Create a list of 5 different behaviors that could be measured in some way. Do not number. Only return a sentence of the behavior.")
     initial_behavior, chat_history = chat_with_ai(prompt, chat_history)
 
-    # user input to select the initial behavior
+    # User input to select the initial behavior
     initial_behavior_list = parse_initial_behavior(initial_behavior)
-    # add printed space and section divider 
+    # Add printed space and section divider
     print(" ")
     print("####################")
     for i, item in enumerate(initial_behavior_list):
@@ -178,9 +207,8 @@ def create_initial_behavior(spo, area_of_focus, operational_objective, psycholog
         except ValueError:
             print("Invalid input. Please enter a number.")
     
-    initial_behavior=  initial_behavior_selected
+    return initial_behavior_selected
 
-    return initial_behavior
 def parse_refined_behavior(refined_behavior):
     try:
         refined_behavior_list = refined_behavior.split('\n')
@@ -188,12 +216,15 @@ def parse_refined_behavior(refined_behavior):
     except Exception as e:
         print(f"Error parsing refined behavior: {e}")
         return []
+
 def refine_desired_behavior(initial_behavior):
     chat_history = []  # Initialize chat history for the conversation
-    prompt = f"The initial desired behavior is: '{initial_behavior}'. create a list, not numbered, of potential refined behaviors. Unknown who the target audience (Ta) would be yet but phrase the desired behavior as 'TA verb_here xxx', but don't use markdown, this must be behaviors that are measurable and that would have an impact towards the objective ?"
+    prompt = (f"The initial desired behavior is: '{initial_behavior}'. Create a list, not numbered, of potential refined behaviors. "
+              f"Unknown who the target audience (TA) would be yet but phrase the desired behavior as 'TA verb_here xxx', but don't use markdown. "
+              f"This must be behaviors that are measurable and that would have an impact towards the objective.")
     refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
     refined_behavior_list = parse_refined_behavior(refined_behavior)
-    # add printed space and section divider 
+    # Add printed space and section divider
     print(" ")
     print("####################")
     for i, item in enumerate(refined_behavior_list):
@@ -208,8 +239,7 @@ def refine_desired_behavior(initial_behavior):
                 print("Please select a valid number from the list above.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-    refined_behavior = refined_behavior_selected
-    return refined_behavior
+    return refined_behavior_selected
 
 def parse_intermediate_behaviors(intermediate_behaviors):
     try:
@@ -218,22 +248,22 @@ def parse_intermediate_behaviors(intermediate_behaviors):
     except Exception as e:
         print(f"Error parsing intermediate behaviors: {e}")
         return []
+
 def break_down_behavior(refined_behavior):
     chat_history = []  # Initialize history for the conversation
     prompt = (f"The desired behavior is: '{refined_behavior}' in '{area_of_focus}'. Consider in backwards order starting from the desired behavior "
               f"and backwards from each previous required behavior but then list it in sequential order ending with the desired behavior. "
-              f"create an list of intermediate behaviors that lead to achieving this behavior?"
-              f"Each behavior must be a sentence and not numbered.don't use markdown, and only return sentences of the behavior without any commentary"
-              f"mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE OPTIONS to complete such as can be done online or autmatically. if multiple options provide the multiple options as the in the steps Option A or Option B etc.")
+              f"Create a list of intermediate behaviors that lead to achieving this behavior. Each behavior must be a sentence and not numbered. Don't use markdown, and only return sentences of the behavior without any commentary. "
+              f"Mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE OPTIONS to complete such as can be done online or automatically. If multiple options, provide the multiple options as in the steps Option A or Option B, etc.")
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     intermediate_behaviors_list = parse_intermediate_behaviors(intermediate_behaviors)
-    # add printed space and section divider 
+    # Add printed space and section divider
     print(" ")
     print("####################")
 
     for i, item in enumerate(intermediate_behaviors_list):
         print(f"{i + 1}. {item}")
-            # ask gpt to modify the intermediate behaviors with the user input or continue
+    # Ask GPT to modify the intermediate behaviors with the user input or continue
     while True:
         user_input = get_user_input("Would you like to modify the intermediate behaviors? (yes/no): ")
         if user_input.lower() == 'yes':
@@ -261,10 +291,9 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the desired behavior: '{desired_behavior}' which will require intermediate behaviors: '{intermediate_behaviors}', "
               f"but have constraints: {constraints}, and restraints: {restraints}, create a list of recommended target audiences (TA): groups, demographics, "
-              f"people of specific psychographics, or individuals that can achieve this behavior."
-              f"Each TA must be a single line and not numbered.don't use markdown,  without any commentary")
+              f"people of specific psychographics, or individuals that can achieve this behavior. Each TA must be a single line and not numbered. Don't use markdown, without any commentary.")
     pta, chat_history = chat_with_ai(prompt, chat_history)
-    # add printed space and section divider 
+    # Add printed space and section divider
     print(" ")
     print("####################")
     pta_list = parse_pta(pta)
@@ -280,15 +309,13 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
                 print("Please select a valid number from the list above.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-    pta = pta_selected
-    return pta
+    return pta_selected
 
 def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the potential target audience: '{pta}', desired behavior: '{desired_behavior}', intermediate behaviors: '{intermediate_behaviors}', "
               f"constraints: {constraints}, and restraints: {restraints}, refine the potential target audience to be focused on those with the capability to perform "
-              f"the desired behaviors, who are in the area where the behaviors must take place, and who might be influenced to perform the desired behavior."
-              f"Each refined TA must be a single line and not numbered.don't use markdown,  without any commentary")
+              f"the desired behaviors, who are in the area where the behaviors must take place, and who might be influenced to perform the desired behavior. Each refined TA must be a single line and not numbered. Don't use markdown, without any commentary.")
     refined_pta, chat_history = chat_with_ai(prompt, chat_history)
     pta_list = parse_pta(refined_pta)
     for i, item in enumerate(pta_list):
@@ -303,8 +330,7 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
                 print("Please select a valid number from the list above.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-    pta = refined_pta_selected
-    return pta
+    return refined_pta_selected
 
 def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_focus, constraints, restraints):
     chat_history = []  # Initialize history for the conversation
@@ -463,9 +489,8 @@ def main():
     area_of_focus, operational_objective, psychological_objective, constraints, restraints = define_mission()
 
     # Step 1: Define and refine the desired behavior
-    #if spo isn't defined, create it
     psychological_objective, spo = influence_mission()
-    print(f"Supporting Psychological Objectives (SPO): {spo}")
+    
     initial_behavior = create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints)
     refined_behavior = refine_desired_behavior(initial_behavior)
     print(f"Refined desired behavior: {refined_behavior}")
