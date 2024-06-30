@@ -100,10 +100,21 @@ def parse_spo(spo):
 
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
-    prompt = (f"You are a Military PSYOP Planner. Given the area of focus: '{area_of_focus}', "
-              f"operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', "
-              f"create a list without numbers of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. "
-              f"Consider the constraints: {constraints} and restraints: {restraints}. This must only be 1 sentence per line with only the SPO.")
+    prompt = (f"You are a Military PSYOP Planner. The Supporting Psychological Objective (SPO) for each series is the culmination point of achieved intermediate objectives. "
+            f"The plan of execution becomes linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding the achievement of the PO, ultimately supporting the commander's objectives. "
+            f"Given the area of focus: '{area_of_focus}', operational objective: '{operational_objective}', and psychological objective: '{psychological_objective}', "
+            f"create a list without numbers of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. "
+            f"Consider the constraints: {constraints} and restraints: {restraints}. Each SPO should be one sentence per line, starting with TA and an appropriate action verb. no markdown. no commentary. "
+            f"Use the following categories of verbs to guide your objectives:\n\n"
+            f"#### Action Verbs\n"
+            f"Increases/Decreases, Votes, Participates (in something specific), Surrenders, Turns in, Organizes/Holds, Attends, Registers, Surrenders.\n\n"
+            f"#### Communication Verbs\n"
+            f"Reports, Publicly condemns/states, Purchases, Donates, Signs, Joins, Refers, Comments, Reviews, Rates.\n\n"
+            f"#### Support Verbs\n"
+            f"Volunteers, Completes.\n\n"
+            f"#### Miscellaneous Verbs\n"
+            f"Renews, Subscribes.\n\n"
+            f"Ensure that the SPOs are specific, measurable, and observable, avoiding weaker verbs such as believes, feels, hopes, thinks, understands, realizes, considers, appreciates, recognizes, assumes, dreams, wishes, imagines, envisions, refrains, stops, halts, ceases, restrains, maintains, continues, notes, observes, views, opposes, includes, questions, favors.")
     spo, chat_history = chat_with_ai(prompt, chat_history)
     parsed_spo = parse_spo(spo)
     
@@ -126,20 +137,29 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
     print("\nSelected SPOs:")
     for idx, spo in enumerate(selected_spos, start=1):
         print(f"{idx}. {spo}")
-
-    # Option to modify the selected SPOs
-    while True:
-        modify_input = get_user_input("\nWould you like to modify any of the selected SPOs? (yes/no): ").lower()
-        if modify_input == 'yes':
+    # Option to modify the selected SPOs if more than 1 spo is selected then modification is required to produce one spo
+    while len(selected_spos) > 1:
+        user_input = get_user_input("\nWould you like to modify the selected SPOs? (yes/no): ")
+        if user_input.lower() == 'yes':
             modification_prompt = get_user_input("Enter your modifications for the selected SPOs: ")
-            prompt = f"Refine the following SPOs: {selected_spos}. Modifications: {modification_prompt}"
-            refined_spos, chat_history = chat_with_ai(prompt, chat_history)
-            refined_spos_list = parse_spo(refined_spos)
-            print("\nRefined SPOs:")
-            for idx, spo in enumerate(refined_spos_list, start=1):
+            prompt = f"Modify the selected SPOs: {modification_prompt}"
+            spo, chat_history = chat_with_ai(prompt, chat_history)
+            parsed_spo = parse_spo(spo)
+            print("\nModified Supporting Psychological Objectives (SPOs):")
+            for idx, spo in enumerate(parsed_spo, start=1):
                 print(f"{idx}. {spo}")
-            selected_spos = refined_spos_list  # Update selected SPOs with refined ones
-        elif modify_input == 'no':
+
+            while True:
+                user_input = get_user_input("\nSelect 1 SPO that is the best: ")
+                selected_spo_index = int(user_input) - 1
+
+                if 0 <= selected_spo_index < len(parsed_spo):
+                    selected_spo = parsed_spo[selected_spo_index]
+                    break
+                else:
+                    print("Invalid selection. Please enter a valid index.")
+            selected_spos = [selected_spo]
+        elif user_input.lower() == 'no':
             break
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
