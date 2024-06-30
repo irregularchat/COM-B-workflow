@@ -76,7 +76,7 @@ def define_mission():
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints
-def Influence_Mission():
+def influence_mission():
     global psychological_objective, spo
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
@@ -464,10 +464,7 @@ def main():
 
     # Step 1: Define and refine the desired behavior
     #if spo isn't defined, create it
-    if not spo:
-        spo = create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints)
-    else:
-        spo
+    psychological_objective, spo = influence_mission()
     print(f"Supporting Psychological Objectives (SPO): {spo}")
     initial_behavior = create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints)
     refined_behavior = refine_desired_behavior(initial_behavior)
