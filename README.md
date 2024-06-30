@@ -12,10 +12,13 @@
 ```shell
 python3 -m venv venv
 source venv/bin/activate
+cp .env-template .env
 pip3 install -r requirements.txt
 ```
 
 ## Running the Script
+### First make sure that you edit .env file and add your OpenAI API key and other requirements
+The more you add in here the faster prompting will be. The .env file is not synced with the git repository so you can add your own information in there.
 
 Run the script using Python:
 This script is focused more on creating a mission statement and identifying a center of gravity. 
