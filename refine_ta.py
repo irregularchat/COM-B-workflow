@@ -216,7 +216,7 @@ def break_down_behavior(refined_behavior):
               f"and backwards from each previous required behavior but then list it in sequential order ending with the desired behavior. "
               f"create an list of intermediate behaviors that lead to achieving this behavior?"
               f"Each behavior must be a sentence and not numbered.don't use markdown, and only return sentences of the behavior without any commentary"
-              f"mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE_OPTIONS to complete such as can be done online or autmatically.")
+              f"mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE OPTIONS to complete such as can be done online or autmatically. if multiple options provide the multiple options as the in the steps Option A or Option B etc.")
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     intermediate_behaviors_list = parse_intermediate_behaviors(intermediate_behaviors)
     # add printed space and section divider 
@@ -272,13 +272,15 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
                 print("Please select a valid number from the list above.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-    return pta_selected
+    pta = pta_selected
+    return pta
 
 def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the potential target audience: '{pta}', desired behavior: '{desired_behavior}', intermediate behaviors: '{intermediate_behaviors}', "
               f"constraints: {constraints}, and restraints: {restraints}, refine the potential target audience to be focused on those with the capability to perform "
-              f"the desired behaviors, who are in the area where the behaviors must take place, and who might be influenced to perform the desired behavior.")
+              f"the desired behaviors, who are in the area where the behaviors must take place, and who might be influenced to perform the desired behavior."
+              f"Each refined TA must be a single line and not numbered.don't use markdown,  without any commentary")
     refined_pta, chat_history = chat_with_ai(prompt, chat_history)
     pta_list = parse_pta(refined_pta)
     for i, item in enumerate(pta_list):
@@ -293,7 +295,8 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
                 print("Please select a valid number from the list above.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-    return refined_pta_selected
+    pta = refined_pta_selected
+    return pta
 
 def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_focus, constraints, restraints):
     chat_history = []  # Initialize history for the conversation
