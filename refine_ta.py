@@ -179,7 +179,7 @@ def parse_refined_behavior(refined_behavior):
         return []
 def refine_desired_behavior(initial_behavior):
     chat_history = []  # Initialize chat history for the conversation
-    prompt = f"The initial desired behavior is: '{initial_behavior}'. create a list of potential refined behaviors. Unknown who the target audience (Ta) would be yet but phrase the desired behavior as 'TA verb_here xxx' ?"
+    prompt = f"The initial desired behavior is: '{initial_behavior}'. create a list, not numbered, of potential refined behaviors. Unknown who the target audience (Ta) would be yet but phrase the desired behavior as 'TA verb_here xxx', but don't use markdown, this must be behaviors that are measurable and that would have an impact towards the objective ?"
     refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
     refined_behavior_list = parse_refined_behavior(refined_behavior)
     for i, item in enumerate(refined_behavior_list):
@@ -206,21 +206,29 @@ def parse_intermediate_behaviors(intermediate_behaviors):
         return []
 def break_down_behavior(refined_behavior):
     chat_history = []  # Initialize history for the conversation
-    prompt = (f"The desired behavior is: '{refined_behavior}'. Consider in backwards order starting from the desired behavior "
+    prompt = (f"The desired behavior is: '{refined_behavior}' in '{area_of_focus}'. Consider in backwards order starting from the desired behavior "
               f"and backwards from each previous required behavior but then list it in sequential order ending with the desired behavior. "
-              f"What are some intermediate behaviors that lead to achieving this behavior?")
+              f"create an list of intermediate behaviors that lead to achieving this behavior?"
+              f"Each behavior must be a sentence and not numbered.don't use markdown, and only return sentences of the behavior without any commentary"
+              f"mark when an intermediate behavior is REQUIRED and mark when it has MULTIPLE_OPTIONS to complete such as can be done online or autmatically.")
     intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
     intermediate_behaviors_list = parse_intermediate_behaviors(intermediate_behaviors)
+    for i, item in enumerate(intermediate_behaviors_list):
+        print(f"{i + 1}. {item}")
+            # ask gpt to modify the intermediate behaviors with the user input or continue
     while True:
-        print(f"\nIntermediate behaviors suggestion: {intermediate_behaviors_list}")
-        user_input = get_user_input("Are these intermediate behaviors acceptable? (yes/no): ")
+        user_input = get_user_input("Would you like to modify the intermediate behaviors? (yes/no): ")
         if user_input.lower() == 'yes':
-            break 
-        else:
-            user_input = get_user_input("How should these intermediate behaviors be refined or modified?: ")
-            prompt = f"Refine the intermediate behaviors using: {user_input}"
+            modification_prompt = get_user_input("Enter your modifications for the intermediate behaviors: ")
+            prompt = f"Modify the intermediate behaviors: {modification_prompt}"
             intermediate_behaviors, chat_history = chat_with_ai(prompt, chat_history)
             intermediate_behaviors_list = parse_intermediate_behaviors(intermediate_behaviors)
+            for i, item in enumerate(intermediate_behaviors_list):
+                print(f"{i + 1}. {item}")
+        elif user_input.lower() == 'no':
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
     return intermediate_behaviors_list
 
 def parse_pta(pta):
