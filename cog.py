@@ -2,6 +2,8 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from colorama import init
+import json
+from serpapi import GoogleSearch
 
 # Define formatting
 HEADER = '\033[95m'
@@ -22,13 +24,14 @@ area_of_focus = os.getenv("AREA_OF_FOCUS", "")
 operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
-
-def initialize_openai():
-    global client
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OpenAI API key not found. Please set it in the .env file.")
-    client = OpenAI(api_key=api_key)
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OpenAI API key not found. Please set it in the .env file.")
+client = OpenAI(api_key=api_key)
+google_search_api_key = os.getenv("GOOGLE_SEARCH_API_KEY")
+if not google_search_api_key:
+    raise ValueError("Google Search API key not found. Please set it in the .env file.")
+google_search_engine_id = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
 
 def get_user_input(prompt):
     try:
@@ -60,6 +63,36 @@ def generate_question(area_of_focus, operational_objective, constraints, restrai
     )
     question, chat_history = chat_with_ai(prompt, chat_history)
     return question, chat_history
+
+def generate_advanced_google_search_query(question):
+    # Generate an advanced Google search query based on the question using the AI
+    query = ""
+    prompt = f"Generate an advanced Google search query for the following question: {question}"
+    return query
+
+def search_google(query, num_results=10):
+    # Search Google using the query and return the top results
+    results = []
+    params = {
+        "engine": "google",
+        "q": query,
+        "num": num_results,
+        "api_key": google_search_api_key,
+    }
+
+    search = GoogleSearch(params)
+    search_results = search.get_dict()
+    return search_results
+
+def extract_headlines_and_links(search_results):
+    # Extract headlines and links from the search results
+    headlines = []
+    links = []
+    if search_results and "organic_results" in search_results:
+        for result in search_results["organic_results"]:
+            headlines.append(result["title"])
+            links.append(result["link"])
+    return headlines, links
 
 def define_mission():
     global area_of_focus, operational_objective, constraints, restraints
@@ -175,7 +208,6 @@ def define_cog(entity_type, area_of_focus, operational_objective, constraints, r
         return None
 
 def main():
-    initialize_openai()
     print(f"{HEADER}Welcome to the Mission Definition Chatbot!{ENDC}")
     area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission()
     define_cog("friendly", area_of_focus, operational_objective, constraints, restraints, mission_statement)
