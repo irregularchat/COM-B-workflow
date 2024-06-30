@@ -46,7 +46,7 @@ Windows commands:
 notepad .env
 ```
 
-Run the script using Python:
+### Run the script using Python:
 This script is focused more on creating a mission statement and identifying a center of gravity. 
 
 ```shell
