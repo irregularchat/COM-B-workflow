@@ -6,9 +6,9 @@
 3. Activate the virtual environment.
 4. Install the required dependencies.
 5. Set your OpenAI API key in an environment variable `OPENAI_API_KEY`.
-  1. Obtain an API key from OpenAI by creating an account and following the instructions.
-  1. Go to https://platform.openai.com/account/api-keys and create a new API key.
-  1. Save this key in the `.env` file and to a password manager
+    1. Obtain an API key from OpenAI by creating an account and following the instructions.
+    1. Go to https://platform.openai.com/account/api-keys and create a new API key.
+    1. Save this key in the `.env` file and to a password manager
 
 ### Commands
 Script to create a virtual environment, installs the dependencies, and creates a `.env` file if it does not exist.
