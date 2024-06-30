@@ -135,31 +135,66 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
             break
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")
+    spo = selected_spos
+    return spo
 
-    return selected_spos
-
-
+def parse_initial_behavior(initial_behavior):
+    try:
+        initial_behavior_list = initial_behavior.split('\n')
+        return [b.strip() for b in initial_behavior_list if b.strip()]
+    except Exception as e:
+        print(f"Error parsing initial behavior: {e}")
+        return []
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"What behavior in {area_of_focus} can help achieve {spo} and get closer to '{operational_objective}' "
               f"by '{psychological_objective}' considering constraints: {constraints}, and restraints: {restraints}? "
-              f"Create a numbered list of 3 different behaviors that could be measured in some way.")
+              f"Create a list of 5 different behaviors that could be measured in some way. do not number. only return a sentence of the behavior.")
     initial_behavior, chat_history = chat_with_ai(prompt, chat_history)
-    return initial_behavior
 
+    # user input to select the initial behavior
+    initial_behavior_list = parse_initial_behavior(initial_behavior)
+    for i, item in enumerate(initial_behavior_list):
+        print(f"{i + 1}. {item}")
+    while True:
+        try:
+            user_input = int(get_user_input("Select an initial behavior from the list above: "))
+            if 0 < user_input <= len(initial_behavior_list):
+                initial_behavior_selected = initial_behavior_list[user_input - 1]
+                break
+            else:
+                print("Please select a valid number from the list above.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    
+    initial_behavior=  initial_behavior_selected
+
+    return initial_behavior
+def parse_refined_behavior(refined_behavior):
+    try:
+        refined_behavior_list = refined_behavior.split('\n')
+        return [b.strip() for b in refined_behavior_list if b.strip()]
+    except Exception as e:
+        print(f"Error parsing refined behavior: {e}")
+        return []
 def refine_desired_behavior(initial_behavior):
     chat_history = []  # Initialize chat history for the conversation
-    prompt = f"The initial desired behavior is: '{initial_behavior}'. How can we make this behavior more specific and measurable?"
+    prompt = f"The initial desired behavior is: '{initial_behavior}'. create a list of potential refined behaviors. Unknown who the target audience (Ta) would be yet but phrase the desired behavior as 'TA verb_here xxx' ?"
     refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
+    refined_behavior_list = parse_refined_behavior(refined_behavior)
+    for i, item in enumerate(refined_behavior_list):
+        print(f"{i + 1}. {item}")
     while True:
-        print(f"Refined behavior suggestion: {refined_behavior}")
-        user_input = get_user_input("Is this refined behavior specific and measurable? (yes/no): ")
-        if user_input.lower() == 'yes':
-            break
-        else:
-            gpt_instructions = get_user_input("How should this behavior be refined?: ")
-            prompt = f"Refine the behavior further using: {gpt_instructions}"
-            refined_behavior, chat_history = chat_with_ai(prompt, chat_history)
+        try:
+            user_input = int(get_user_input("Select a refined behavior from the list above: "))
+            if 0 < user_input <= len(refined_behavior_list):
+                refined_behavior_selected = refined_behavior_list[user_input - 1]
+                break
+            else:
+                print("Please select a valid number from the list above.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    refined_behavior = refined_behavior_selected
     return refined_behavior
 
 def parse_intermediate_behaviors(intermediate_behaviors):
