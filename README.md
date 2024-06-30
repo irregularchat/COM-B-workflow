@@ -19,6 +19,8 @@ Linux and macOS commands:
 python3 -m venv venv
 source venv/bin/activate
 if [ ! -f .env ]; then cp .env.template .env; fi
+#set permissions for the .env file
+chmod 600 .env #set permissions for the .env file to read/write only for the owner
 pip3 install -r requirements.txt
 ```
 
@@ -27,6 +29,7 @@ Windows commands:
 python -m venv venv
 venv\Scripts\activate
 if not exist .env copy .env.template .env
+icacls .env /inheritance:r #remove inherited permissions
 pip install -r requirements.txt
 ```
 
