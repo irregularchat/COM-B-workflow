@@ -49,6 +49,7 @@ def chat_with_ai(prompt, chat_history=[]):
         return "", chat_history
 
 def define_mission():
+    global area_of_focus, operational_objective, constraints, restraints
     area_of_focus = ""
     operational_objective = ""
     psychological_objective = ""
@@ -83,6 +84,13 @@ def define_mission():
     print(f"Constraints: {constraints}")
     print(f"Restraints: {restraints}")
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints
+def parse_spo(spo):
+    try:
+        spo_list = spo.split('\n')
+        return spo_list
+    except Exception as e:
+        print(f"Error parsing SPO: {e}")
+        return []
 
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
@@ -91,15 +99,38 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
               f"create a list of specific, measurable, and observable supporting psychological objectives (SPOs) that can be achieved. "
               f"Consider the constraints: {constraints} and restraints: {restraints}.")
     spo, chat_history = chat_with_ai(prompt, chat_history)
-    return spo
+    parsed_spo = parse_spo(spo)
+    
+    # Display the SPOs to the user
+    print(f"SPOs: {parsed_spo}")
+    while True:
+        user_input = get_user_input("Select 1 or 2 SPOs that are the best (comma-separated if 2): ")
+        selected_spo_indices = [int(i) for i in user_input.split(',') if i.isdigit()]
+        
+        if all(0 <= index < len(parsed_spo) for index in selected_spo_indices) and 1 <= len(selected_spo_indices) <= 2:
+            selected_spos = [parsed_spo[index] for index in selected_spo_indices]
+            break
+        else:
+            print("Invalid selection. Please enter 1 or 2 valid indices.")
+    
+    print(f"Selected SPOs: {selected_spos}")
+    
+    while True:
+        modify_input = get_user_input("Would you like to modify any of the selected SPOs? (yes/no): ").lower()
+        if modify_input == 'yes':
+            modification_prompt = get_user_input("Enter your modifications for the selected SPOs: ")
+            prompt = f"Refine the following SPOs: {selected_spos}. Modifications: {modification_prompt}"
+            refined_spos, chat_history = chat_with_ai(prompt, chat_history)
+            refined_spos_list = parse_spo(refined_spos)
+            print(f"Refined SPOs: {refined_spos_list}")
+            selected_spos = refined_spos_list  # Update selected SPOs with refined ones
+        elif modify_input == 'no':
+            break
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+    
+    return selected_spos
 
-def parse_spo(spo):
-    try:
-        spo_list = spo.split('\n')
-        return spo_list
-    except Exception as e:
-        print(f"Error parsing SPO: {e}")
-        return []
 
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
     chat_history = []  # Initialize chat history for the conversation
