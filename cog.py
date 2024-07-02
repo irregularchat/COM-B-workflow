@@ -23,12 +23,26 @@ operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
 
+
+
+
 def initialize_openai():
     global client
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OpenAI API key not found. Please set it in the .env file.")
-    client = OpenAI(api_key=api_key)
+    
+    # Point to the local server
+    client = OpenAI(base_url="https://gpt.irregulars.io/v1", api_key="lm-studio")
+
+    completion = client.chat.completions.create(
+    model="lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF",
+    messages=[
+        {"role": "system", "content": "Be factual."},
+    ],
+    temperature=0.7,
+    )
+
 
 def get_user_input(prompt):
     try:
