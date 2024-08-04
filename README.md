@@ -1,7 +1,9 @@
 # COM-B-workflow
 ## Setup
-
-1. Clone the repository or download the script files. 
+0. Install Brew (macOS) or Chocolatey (Windows) if you haven't already.
+    1. Brew: https://brew.sh/
+    1. Chocolatey: https://chocolatey.org/
+1. Clone the repository or download the script files. [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) if you haven't already.
 2. Create a virtual environment.
 3. Activate the virtual environment.
 4. Install the required dependencies.
@@ -28,20 +30,29 @@ cd COM-B-workflow
 
 Script to create a virtual environment, installs the dependencies, and creates a `.env` file if it does not exist.
 
-Linux and macOS commands:
+#### Linux and macOS commands:
+**Create a virtual environment and activate it**:
 ```shell
 python3 -m venv venv
 source venv/bin/activate
+```
+
+**Set up the .env file and install the dependencies**:
+```shell
 if [ ! -f .env ]; then cp .env.template .env; fi
 #set permissions for the .env file
 chmod 600 .env #set permissions for the .env file to read/write only for the owner
 pip3 install -r requirements.txt
 ```
 
-Windows commands:
+#### Windows commands:
+**Create a virtual environment and activate it**:
 ```shell
 python -m venv venv
 venv\Scripts\activate
+```
+**Set up the .env file and install the dependencies**:
+```shell
 if not exist .env copy .env.template .env
 icacls .env /inheritance:r #remove inherited permissions
 pip install -r requirements.txt
