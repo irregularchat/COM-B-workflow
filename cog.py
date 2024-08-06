@@ -41,7 +41,7 @@ def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=chat_history
         )
         ai_response = response.choices[0].message.content

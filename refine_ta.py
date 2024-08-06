@@ -34,7 +34,7 @@ def initialize_openai():
 # Function to get AI suggestions
 def get_ai_suggestions(prompt):
     try:
-        response = client.completions.create(engine="gpt-3.5-turbo",
+        response = client.completions.create(engine="gpt-4o-mini",
                                              prompt=prompt,
                                              max_tokens=300)
         return response.choices[0].text.strip()
@@ -54,7 +54,7 @@ def get_user_input(prompt):
 def chat_with_ai(prompt, chat_history=[]):
     try:
         chat_history.append({"role": "user", "content": prompt})
-        response = client.chat.completions.create(model="gpt-4",
+        response = client.chat.completions.create(model="gpt-4o",
                                                   messages=chat_history)
         ai_response = response.choices[0].message.content
         chat_history.append({"role": "assistant", "content": ai_response})
