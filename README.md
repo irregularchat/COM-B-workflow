@@ -1,6 +1,14 @@
 # COM-B-workflow
 ## Setup
-
+0. Install Package Manager:
+    - MacOS: # install [homebrew](https://brew.sh/)
+    ```shell
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    ```
+    - Windows: # install [chocolatey](https://chocolatey.org/install)
+    ```shell
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    ```
 1. Clone the repository or download the script files. 
 2. Create a virtual environment.
 3. Activate the virtual environment.
@@ -28,20 +36,28 @@ cd COM-B-workflow
 
 Script to create a virtual environment, installs the dependencies, and creates a `.env` file if it does not exist.
 
-Linux and macOS commands:
+#### Linux and macOS commands:
+**Activate the virtual environment**
 ```shell
 python3 -m venv venv
 source venv/bin/activate
+```
+**Create the .env file, set permissions, and install the dependencies**
+```shell
 if [ ! -f .env ]; then cp .env.template .env; fi
 #set permissions for the .env file
 chmod 600 .env #set permissions for the .env file to read/write only for the owner
 pip3 install -r requirements.txt
 ```
 
-Windows commands:
+#### Windows commands:
+**Activate the virtual environment**
 ```shell
 python -m venv venv
 venv\Scripts\activate
+```
+**Create the .env file, set permissions, and install the dependencies**
+```shell
 if not exist .env copy .env.template .env
 icacls .env /inheritance:r #remove inherited permissions
 pip install -r requirements.txt
