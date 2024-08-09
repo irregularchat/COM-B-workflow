@@ -18,6 +18,15 @@ UNDERLINE = '\033[4m'
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
+
+
+# Example of running the assistant with a specific query
+response = assistant.run(
+    input="Your query here",
+    tool_choice="file_search",  # specify the tool if needed
+    max_tokens=100,  # control the maximum number of tokens used
+)
+assistant_id = os.getenv("ASSISTANT_ID", "")
 area_of_focus = os.getenv("AREA_OF_FOCUS", "")
 operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
@@ -27,10 +36,11 @@ spo = os.getenv("SPO", "")
 
 def initialize_openai():
     global client
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    if client.api_key is None:
-        raise ValueError("OpenAI API key not found. Please set it in the .env file.")
-
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+    if client is None:
+        print("Error initializing OpenAI client.")
+        return
+    
 # Function to get AI suggestions
 def get_ai_suggestions(prompt):
     try:
