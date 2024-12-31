@@ -1,3 +1,4 @@
+#openai_utils.py
 import openai
 import os
 from dotenv import load_dotenv
@@ -6,6 +7,9 @@ from dotenv import load_dotenv
 model_name = "gpt-4"
 
 def initialize_openai():
+    """
+    Initialize the OpenAI API key.
+    """
     load_dotenv()  # Load environment variables from .env file
     api_key = os.getenv("OPENAI_API_KEY", "")
 
@@ -16,6 +20,9 @@ def initialize_openai():
     openai.api_key = api_key
 
 def get_ai_suggestions(prompt):
+    """
+    Get AI suggestions from the OpenAI API.
+    """
     try:
         response = openai.Completion.create(
             model=model_name,
@@ -28,6 +35,9 @@ def get_ai_suggestions(prompt):
         return ""
 
 def chat_with_ai(prompt, chat_history=[]):
+    """
+    Chat with the AI.
+    """
     try:
         # The latest API uses a 'messages' list for chat history, each message must be in a specific format
         if not chat_history:

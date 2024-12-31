@@ -1,3 +1,4 @@
+#refine_ta.py
 from openai import OpenAI
 import os
 import argparse
@@ -5,16 +6,15 @@ from dotenv import load_dotenv
 from colorama import init
 
 # Define formatting
-HEADER = '\033[95m'
-BLUE = '\033[94m'
-CYAN = '\033[96m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-RED = '\033[91m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
-#TODO: Add the rest of the formatting to the script, no spacing between the formatting and the code
+HEADER = '\033[95m' # Purple
+BLUE = '\033[94m' # Blue
+CYAN = '\033[96m' # Cyan
+GREEN = '\033[92m' # Green
+YELLOW = '\033[93m' # Yellow
+RED = '\033[91m' # Red
+ENDC = '\033[0m' # Reset
+BOLD = '\033[1m' # Bold
+UNDERLINE = '\033[4m' # Underline
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
@@ -35,6 +35,9 @@ psychological_objective = os.getenv("PSYCHOLOGICAL_OBJECTIVE", "")
 spo = os.getenv("SPO", "")
 
 def initialize_openai():
+    """
+    Initialize the OpenAI API key.
+    """
     global client
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
     if client is None:
@@ -43,6 +46,9 @@ def initialize_openai():
     
 # Function to get AI suggestions
 def get_ai_suggestions(prompt):
+    """
+    Get AI suggestions from the OpenAI API.
+    """
     try:
         response = client.completions.create(engine="gpt-4o-mini",
                                              prompt=prompt,
@@ -54,6 +60,9 @@ def get_ai_suggestions(prompt):
 
 # Function to get user input with a prompt
 def get_user_input(prompt):
+    """
+    Get user input from the console.
+    """
     try:
         return input(prompt)
     except EOFError:
@@ -62,6 +71,9 @@ def get_user_input(prompt):
 
 # Function to chat with AI for detailed responses
 def chat_with_ai(prompt, chat_history=[]):
+    """
+    Chat with the AI passing the prompt and chat history.
+    """
     try:
         chat_history.append({"role": "user", "content": prompt})
         response = client.chat.completions.create(model="gpt-4o",
@@ -74,6 +86,9 @@ def chat_with_ai(prompt, chat_history=[]):
         return "", chat_history
 
 def define_mission():
+    """
+    Define the mission using the environment variables.
+    """
     global area_of_focus, operational_objective, constraints, restraints
     psychological_objective = ""
     while area_of_focus == "":
@@ -107,6 +122,9 @@ def define_mission():
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints, operational_context
 
 def influence_mission():
+    """
+    Influence the mission using the environment variables.
+    """
     global psychological_objective, spo
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
@@ -121,6 +139,9 @@ def influence_mission():
     return psychological_objective, spo
 
 def parse_spo(spo):
+    """
+    Parse the SPO into a list of strings.
+    """
     try:
         spo_list = spo.split('\n')
         return [s.strip() for s in spo_list if s.strip()]
@@ -129,6 +150,9 @@ def parse_spo(spo):
         return []
 
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    """
+    Create the SPO using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"You are a Military PSYOP Planner. The Supporting Psychological Objective (SPO) for each series is the culmination point of achieved intermediate objectives. "
               f"The plan of execution becomes linear with intermediate objectives preceding SPO accomplishment, and SPOs preceding the achievement of the PO, ultimately supporting the commander's objectives. "
@@ -170,6 +194,7 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
 
     # Option to modify the selected SPO
     while True:
+        # Get user input to modify the selected SPO
         user_input = get_user_input("\nWould you like to modify the selected SPO? {YELLOW}(yes/no){ENDC}: ")
         if user_input.lower() == 'yes':
             modification_prompt = get_user_input("{YELLOW}Enter your modifications for the selected SPO:{ENDC} ")
@@ -198,12 +223,16 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
             print("{RED}Invalid input.{ENDC} {YELLOW}Please enter 'yes' or 'no'.{ENDC}")
 
     if not selected_spo:
+        # If the selected SPO is empty, print an error message
         print("{RED}SPO cannot be empty.{ENDC}")
         return ""
     spo = selected_spo
     return spo
 
 def parse_initial_behavior(initial_behavior):
+    """
+    Parse the initial behavior into a list of strings.
+    """
     try:
         initial_behavior_list = initial_behavior.split('\n')
         return [b.strip() for b in initial_behavior_list if b.strip()]
@@ -212,6 +241,9 @@ def parse_initial_behavior(initial_behavior):
         return []
 
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    """
+    Create the initial behavior using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"What behavior in {area_of_focus} can help achieve {spo} and get closer to '{operational_objective}' "
               f"by '{psychological_objective}' considering constraints: {constraints}, and restraints: {restraints}? "
@@ -239,6 +271,9 @@ def create_initial_behavior(spo, area_of_focus, operational_objective, psycholog
     return initial_behavior_selected
 
 def parse_refined_behavior(refined_behavior):
+    """
+    Parse the refined behavior into a list of strings.
+    """
     try:
         refined_behavior_list = refined_behavior.split('\n')
         return [b.strip() for b in refined_behavior_list if b.strip()]
@@ -247,6 +282,9 @@ def parse_refined_behavior(refined_behavior):
         return []
 
 def refine_desired_behavior(initial_behavior):
+    """
+    Refine the desired behavior using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"The initial desired behavior is: '{initial_behavior}'. Create a list, not numbered, of potential refined behaviors. "
               f"Unknown who the target audience (TA) would be yet but phrase the desired behavior as 'TA verb_here xxx', but don't use markdown. "
@@ -271,6 +309,9 @@ def refine_desired_behavior(initial_behavior):
     return refined_behavior_selected
 
 def parse_intermediate_behaviors(intermediate_behaviors):
+    """
+    Parse the intermediate behaviors into a list of strings.
+    """
     try:
         intermediate_behaviors_list = intermediate_behaviors.split('\n')
         return [b.strip() for b in intermediate_behaviors_list if b.strip()]
@@ -279,6 +320,9 @@ def parse_intermediate_behaviors(intermediate_behaviors):
         return []
 
 def break_down_behavior(refined_behavior):
+    """
+    Break down the desired behavior into intermediate behaviors.
+    """
     chat_history = []  # Initialize history for the conversation
     prompt = (f"The desired behavior is: '{refined_behavior}' in '{area_of_focus}'. Consider in backwards order starting from the desired behavior "
               f"and backwards from each previous required behavior but then list it in sequential order ending with the desired behavior. "
@@ -309,6 +353,9 @@ def break_down_behavior(refined_behavior):
     return intermediate_behaviors_list
 
 def parse_pta(pta):
+    """
+    Parse the potential target audience into a list of strings.
+    """
     try:
         pta_list = pta.split('\n')
         return [p.strip() for p in pta_list if p.strip()]
@@ -317,6 +364,9 @@ def parse_pta(pta):
         return []
 
 def select_potential_target_audience(desired_behavior, intermediate_behaviors, constraints, restraints, operational_context):
+    """
+    Select the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the desired behavior: '{desired_behavior}' which will require intermediate behaviors: '{intermediate_behaviors}', "
               f"but have constraints: {constraints}, and restraints: {restraints}, and our {operational_context} create a list of recommended target audiences (TA): groups, demographics, "
@@ -341,6 +391,9 @@ def select_potential_target_audience(desired_behavior, intermediate_behaviors, c
     return pta_selected
 
 def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restraints):
+    """
+    Refine the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (f"Given the potential target audience: '{pta}', desired behavior: '{desired_behavior}', intermediate behaviors: '{intermediate_behaviors}', "
               f"constraints: {constraints}, and restraints: {restraints}, refine the potential target audience to be focused on those with the capability to perform "
@@ -362,6 +415,9 @@ def refine_pta(pta, desired_behavior, intermediate_behaviors, constraints, restr
     return refined_pta_selected
 
 def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_focus, constraints, restraints, operational_context):
+    """
+    Assess the capability of the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize history for the conversation
     psychological_prompt = (
         f"We are refining the current Target Audience by the capability to perform {desired_behavior} which consists of {intermediate_behaviors}. "
@@ -429,6 +485,9 @@ def assess_capability(intermediate_behaviors, desired_behavior, pta, area_of_foc
     return capable_pta
 
 def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, constraints, restraints, operational_context):
+    """
+    Assess the opportunity of the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize history for the conversation
     social_prompt = (
         f"We are assessing the environmental opportunity in or around {area_of_focus} of the TA to perform the desired behavior and its intermediate behaviors. "
@@ -480,6 +539,9 @@ def assess_opportunity(intermediate_behaviors, capable_pta, area_of_focus, const
     return capable_opportune_pta
 
 def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_focus, constraints, restraints, operational_context):
+    """
+    Assess the motivation of the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize history for the conversation
     automatic_prompt = (
         f"We are assessing the motivation of the TA to perform the desired behavior and its intermediate behaviors. "
@@ -531,6 +593,9 @@ def assess_motivation(intermediate_behaviors, capable_opportune_pta, area_of_foc
     return motivated_pta
 
 def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focus, constraints, restraints):
+    """
+    Determine the HPEM stage of the potential target audience using the environment variables.
+    """
     chat_history = []  # Initialize history for the conversation
     stages = ["Awareness", "Understanding", "Attitude", "Preference", "Intention", "Behavior"]
     current_stage = stages[0]
@@ -546,6 +611,9 @@ def determine_hpem_stage(refined_target_audience, desired_behavior, area_of_focu
     return current_stage
 
 def main():
+    """
+    Main function to run the Target Audience Refinement Tool using COM-B and HPEM Models.
+    """
     print("Welcome to the Target Audience Refinement Tool using COM-B and HPEM Models.")
     initialize_openai()
 
@@ -554,8 +622,9 @@ def main():
 
     # Step 1: Define and refine the desired behavior
     psychological_objective, spo = influence_mission()
-    
+    # Step 1.1: Create the initial behavior
     initial_behavior = create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints)
+    # Step 1.2: Refine the desired behavior
     refined_behavior = refine_desired_behavior(initial_behavior)
     print(f"Refined desired behavior: {refined_behavior}")
 

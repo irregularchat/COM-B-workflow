@@ -1,3 +1,4 @@
+#mission_utils.py
 from openai_utils import chat_with_ai
 from utils import get_user_input  # Correct import
 import os
@@ -47,6 +48,9 @@ def refine_mission_statement(mission_statement):
     return refined_statement
 
 def define_mission():
+    """
+    Define the mission using the environment variables.
+    """
     # Load the variables needed for the script
     area_of_focus = os.getenv("AREA_OF_FOCUS", "")
     operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
@@ -86,6 +90,9 @@ def define_mission():
     return area_of_focus, operational_objective, psychological_objective, constraints, restraints, operational_context
 
 def influence_mission(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    """
+    Influence the mission using the environment variables.
+    """
     spo = ""
     while psychological_objective == "":
         psychological_objective = get_user_input("Enter the psychological objective: ")
@@ -100,6 +107,9 @@ def influence_mission(area_of_focus, operational_objective, psychological_object
     return psychological_objective, spo
 
 def parse_spo(spo):
+    """
+    Parse the SPO into a list of strings.
+    """
     try:
         spo_list = spo.split('\n')
         return [s.strip() for s in spo_list if s.strip()]
@@ -108,6 +118,9 @@ def parse_spo(spo):
         return []
 
 def create_spo(area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    """
+    Create the SPO using the environment variables.
+    """
     chat_history = []
     prompt = (
         f"You are a Military PSYOP Planner. The Supporting Psychological Objective (SPO) for each series is the culmination point of achieved intermediate objectives. "
@@ -127,6 +140,9 @@ def create_spo(area_of_focus, operational_objective, psychological_objective, co
     return selected_spo
 
 def select_spo(parsed_spo):
+    """
+    Select the SPO from the list of SPOs.
+    """
     while True:
         user_input = get_user_input("Select 1 SPO that is the best: ")
         if user_input.strip().isdigit():
@@ -159,6 +175,9 @@ def select_spo(parsed_spo):
 
     return selected_spo
 def create_initial_behavior(spo, area_of_focus, operational_objective, psychological_objective, constraints, restraints):
+    """
+    Create the initial behavior using the environment variables.
+    """
     chat_history = []
     prompt = (
         f"Given the area of focus '{area_of_focus}', operational objective '{operational_objective}', psychological objective '{psychological_objective}', "
@@ -177,6 +196,9 @@ def create_initial_behavior(spo, area_of_focus, operational_objective, psycholog
     return selected_behavior
 
 def select_initial_behavior(initial_behavior_list):
+    """
+    Select the initial behavior from the list of initial behaviors.
+    """
     while True:
         user_input = get_user_input("Select 1 initial behavior that is the best: ")
         if user_input.strip().isdigit():
@@ -210,6 +232,9 @@ def select_initial_behavior(initial_behavior_list):
     return selected_behavior
 
 def refine_desired_behavior(initial_behavior):
+    """
+    Refine the desired behavior using the environment variables.
+    """
     chat_history = []  # Initialize chat history for the conversation
     prompt = (
         f"The initial desired behavior is: '{initial_behavior}'. Create a list, not numbered, of potential refined behaviors. "
@@ -238,6 +263,9 @@ def refine_desired_behavior(initial_behavior):
     
     return refined_behavior_selected
 def break_down_behavior(refined_behavior, area_of_focus):
+    """
+    Break down the desired behavior into intermediate behaviors.
+    """
     chat_history = []  # Initialize history for the conversation
     prompt = (
         f"The desired behavior is: '{refined_behavior}' in '{area_of_focus}'. Consider in backwards order starting from the desired behavior "

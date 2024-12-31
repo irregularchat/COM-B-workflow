@@ -4,15 +4,16 @@ from dotenv import load_dotenv
 from colorama import init
 
 # Define formatting
-HEADER = '\033[95m'
-BLUE = '\033[94m'
-CYAN = '\033[96m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-RED = '\033[91m'
-ENDC = '\033[0m'
-BOLD = '\033[1m'
-UNDERLINE = '\033[4m'
+## Colors
+HEADER = '\033[95m' # Purple
+BLUE = '\033[94m' # Blue
+CYAN = '\033[96m' # Cyan
+GREEN = '\033[92m' # Green
+YELLOW = '\033[93m' # Yellow
+RED = '\033[91m' # Red
+ENDC = '\033[0m' # Reset
+BOLD = '\033[1m' # Bold
+UNDERLINE = '\033[4m' # Underline
 
 # Import the OpenAI API key from a separate .env file
 load_dotenv()
@@ -24,6 +25,9 @@ constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
 
 def initialize_openai():
+    """
+    Initialize the OpenAI client.
+    """
     global client
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
@@ -31,6 +35,9 @@ def initialize_openai():
     client = OpenAI(api_key=api_key)
 
 def get_user_input(prompt):
+    """
+    Get user input from the console.
+    """
     try:
         return input(prompt)
     except EOFError:
@@ -38,6 +45,9 @@ def get_user_input(prompt):
         return ""
 
 def chat_with_ai(prompt, chat_history=[]):
+    """
+    Chat with the AI.
+    """
     try:
         chat_history.append({"role": "user", "content": prompt})
         response = client.chat.completions.create(
@@ -52,7 +62,9 @@ def chat_with_ai(prompt, chat_history=[]):
         return "", chat_history
 
 def generate_question(area_of_focus, operational_objective, constraints, restraints, chat_history):
-    # Generate a question based on the context using the AI
+    """
+    Generate a question based on the context using the AI.
+    """
     question = ""
     prompt = (
         f"Think like a planner, In {area_of_focus}, trying to achieve: {operational_objective}, "
@@ -62,6 +74,9 @@ def generate_question(area_of_focus, operational_objective, constraints, restrai
     return question, chat_history
 
 def define_mission():
+    """
+    Define the mission using the AI.
+    """
     global area_of_focus, operational_objective, constraints, restraints
     if not area_of_focus:
         area_of_focus = get_user_input("Enter the area of focus: ")
@@ -109,13 +124,18 @@ def define_mission():
     return area_of_focus, operational_objective, constraints, restraints, mission_statement
 
 def parse_cog_response(response):
-    # Parse the AI response to extract the Center of Gravity definitions
+    """
+    Parse the AI response to extract the Center of Gravity definitions.
+    """
     cogs = response.split(";")[:3]  # Assuming AI provides semicolon-separated recommendations
     for i, cog in enumerate(cogs, 1):
         print(f"{i}. {cog.strip()}")
     return cogs
 
 def define_cog(entity_type, area_of_focus, operational_objective, constraints, restraints, mission_statement):
+    """
+    Define the Center of Gravity for a given entity type.
+    """
     print(f"\nDefining Center of Gravity for {entity_type}...")
 
     # Initialize chat history and DIME questions tailored to the entity type
@@ -175,6 +195,9 @@ def define_cog(entity_type, area_of_focus, operational_objective, constraints, r
         return None
 
 def main():
+    """
+    Main function to run the program and define the Center of Gravity for friendly, enemy, and host nation.
+    """
     initialize_openai()
     print(f"{HEADER}Welcome to the Mission Definition Chatbot!{ENDC}")
     area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission()

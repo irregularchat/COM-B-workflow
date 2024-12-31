@@ -1,3 +1,4 @@
+#mission_statement_generator.py
 import os
 from mission_utils import generate_mission_statement  # Assuming this utility exists
 from openai_utils import chat_with_ai  # Assuming OpenAI API is used for generation
@@ -8,6 +9,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def main():
+    """
+    Main function to run the program and generate a mission statement.
+    """
     # Load variables from .env and prompt the user for any missing information
     area_of_focus = os.getenv("AREA_OF_FOCUS", "") or get_user_input("Enter the area of focus: ")
     operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "") or get_user_input("Enter the operational objective: ")
@@ -17,6 +21,9 @@ def main():
     spo = os.getenv("SPO", "") or get_user_input("Enter the supporting psychological objective (SPO): ")
 
     # Store the data in a dictionary
+    """
+    Store the data in a dictionary including the area of focus, operational objective, constraints, restraints, psychological objective, and supporting psychological objective (SPO).
+    """
     data = {
         "area_of_focus": area_of_focus,
         "operational_objective": operational_objective,

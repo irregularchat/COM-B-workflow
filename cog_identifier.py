@@ -3,6 +3,9 @@ from cog_utils import define_cog  # Assuming this utility exists
 from utils import load_data, save_output, get_user_input  # General utility functions
 
 def main():
+    """
+    Main function to run the program and identify the Center of Gravity (COG) for friendly, partner, and competitor.
+    """
     parser = argparse.ArgumentParser(description="Identify the Center of Gravity (COG).")
     parser.add_argument("--input", type=str, required=True, help="Path to the input file")
     parser.add_argument("--output", type=str, required=True, help="Path to save the COG analysis")
@@ -23,6 +26,9 @@ def main():
     selected_entities = []
 
     if selection:
+        """
+        Select the entities for which the COG is to be identified.
+        """
         if '1' in selection:
             selected_entities.append("friendly")
         if '2' in selection:
@@ -37,6 +43,9 @@ def main():
     cog_results = {}
     
     for entity in selected_entities:
+        """
+        Define the COG for each selected entity.
+        """
         cog = define_cog(
             entity_type=entity,
             area_of_focus=data.get("area_of_focus", ""),
@@ -48,6 +57,9 @@ def main():
         cog_results[entity] = cog
     
     # Save the output
+    """
+    Save the COG results to a file.
+    """
     save_output(args.output, cog_results)
     print(f"Center of Gravity (COG) analysis saved to {args.output}")
 

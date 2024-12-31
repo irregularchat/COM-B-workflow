@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 from openai_utils import get_ai_suggestions
 from utils import get_user_input
 
-# Define text formatting constants
-HEADER = '\033[95m'
-BOLD = '\033[1m'
-ENDC = '\033[0m'
+# Define text formatting constants for console output
+HEADER = '\033[95m' # Purple
+BOLD = '\033[1m' # Bold
+ENDC = '\033[0m' # Reset
 
 # Load environment variables
 load_dotenv()
