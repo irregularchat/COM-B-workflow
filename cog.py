@@ -24,6 +24,67 @@ operational_objective = os.getenv("OPERATIONAL_OBJECTIVE", "")
 constraints = os.getenv("CONSTRAINTS", "None")
 restraints = os.getenv("RESTRAINTS", "None")
 
+def confirm_mission():
+    """
+    Confirm the mission using the environment variables.
+    """
+    global area_of_focus, operational_objective, constraints, restraints
+    # determine which variables are not empty and which are
+    # Create a dictionary of variables and their values
+    mission_vars = {
+        "Area of Focus": area_of_focus,
+        "Operational Objective": operational_objective,
+        "Constraints": constraints,
+        "Restraints": restraints
+    }
+
+    # Separate into empty and non-empty variables
+    empty_vars = []
+    non_empty_vars = []
+    
+    for var_name, value in mission_vars.items():
+        if not value or value.isspace():
+            empty_vars.append(var_name)
+        else:
+            non_empty_vars.append(var_name)
+    # Print out existing mission details, highlighting missing values as "BLANK"
+    print(f"{BOLD}Existing Mission Details{ENDC}")
+    for var_name in mission_vars:
+        value = mission_vars[var_name] if mission_vars[var_name] else "BLANK"
+        print(f"{var_name}: {value}")
+    
+    # Ask use if they want to modify any of the details
+    modify = get_user_input(f"{BOLD}Would you like to modify any of the details?{ENDC} (y/n): ")
+    if modify.lower() == "y":
+        while True:
+            print("\nSelect the detail you want to modify:")
+            print(f"1. Area of Focus (current: {area_of_focus})")
+            print(f"2. Operational Objective (current: {operational_objective})")
+            print(f"3. Constraints (current: {constraints})")
+            print(f"4. Restraints (current: {restraints})")
+            print("5. Done modifying")
+            
+            choice = get_user_input("Enter the number of your choice: ")
+            
+            if choice == "1":
+                area_of_focus = get_user_input("Enter the new Area of Focus: ")
+            elif choice == "2":
+                operational_objective = get_user_input("Enter the new Operational Objective: ")
+            elif choice == "3":
+                constraints = get_user_input("Enter the new Constraints (optional): ")
+                if not constraints:
+                    constraints = "None"
+            elif choice == "4":
+                restraints = get_user_input("Enter the new Restraints (optional): ")
+                if not restraints:
+                    restraints = "None"
+            elif choice == "5":
+                break
+            else:
+                print("Invalid choice. Please select a valid option.")
+    else:
+        return
+
 def initialize_openai():
     """
     Initialize the OpenAI client.
@@ -67,15 +128,15 @@ def generate_question(area_of_focus, operational_objective, constraints, restrai
     """
     question = ""
     prompt = (
-        f"Think like a planner, In {area_of_focus}, trying to achieve: {operational_objective}, "
-        f"Constraints: {constraints}, Restraints: {restraints}. Please provide a question that helps define the mission."
+        f"Think like a operation design planner, In {area_of_focus}, trying to achieve: {operational_objective}, "
+        f"Constraints: {constraints}, Restraints: {restraints}. Provide 2 assumptions about the mission and 2 blurbs about the problemset. Please provide a question that helps define the mission."
     )
     question, chat_history = chat_with_ai(prompt, chat_history)
     return question, chat_history
 
 def define_mission():
     """
-    Define the mission using the AI.
+    Define the mission using the AI to gather information from the user.
     """
     global area_of_focus, operational_objective, constraints, restraints
     if not area_of_focus:
@@ -200,9 +261,10 @@ def main():
     """
     initialize_openai()
     print(f"{HEADER}Welcome to the Mission Definition Chatbot!{ENDC}")
-    area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission()
-    define_cog("friendly", area_of_focus, operational_objective, constraints, restraints, mission_statement)
-    define_cog("enemy", area_of_focus, operational_objective, constraints, restraints, mission_statement)
+    confirm_mission() # This will modify the global variables if the user wants to
+    area_of_focus, operational_objective, constraints, restraints, mission_statement = define_mission() # This will define the mission and print out the details
+    define_cog("friendly", area_of_focus, operational_objective, constraints, restraints, mission_statement) # This will define the Center of Gravity for the friendly entity
+    define_cog("enemy", area_of_focus, operational_objective, constraints, restraints, mission_statement) # This will define the Center of Gravity for the enemy entity
     define_cog("host nation", area_of_focus, operational_objective, constraints, restraints, mission_statement)
 
 if __name__ == "__main__":
